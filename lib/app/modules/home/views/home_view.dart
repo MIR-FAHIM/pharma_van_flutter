@@ -1,7 +1,6 @@
 // lib/app/modules/home/views/home_view.dart
 
 import 'dart:io';
-
 import 'package:ecom_user_flutter/app/modules/banner/view/home_banner_view.dart';
 import 'package:ecom_user_flutter/app/modules/category/controller/category_controller.dart';
 import 'package:ecom_user_flutter/app/modules/category/view/home_category_child_row.dart';
@@ -22,7 +21,6 @@ import 'package:ecom_user_flutter/app/routes/app_pages.dart';
 import 'package:ecom_user_flutter/common/Color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -171,7 +169,7 @@ class HomeView extends GetView<HomeController> {
               // Featured Product section, PDF uses #00509D with low opacity
               SliverToBoxAdapter(
                 child: _PdfSectionBlock(
-                  backgroundColor:AppColors.primaryColor.withOpacity(0.32),
+                  backgroundColor: AppColors.primaryColor.withOpacity(0.32),
                   padding: const EdgeInsets.fromLTRB(0, 10, 0, 12),
                   child: const HomeFeaturedProductsSection(),
                 ),
@@ -192,7 +190,7 @@ class HomeView extends GetView<HomeController> {
                 child: SizedBox(height: 14),
               ),
 
-   SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: _PdfSectionBlock(
                   backgroundColor: AppColors.backgroundColor,
                   child: HomeMedicineSection(),
@@ -203,21 +201,7 @@ class HomeView extends GetView<HomeController> {
                 child: SizedBox(height: 14),
               ),
 
-              // Fashion section, PDF uses #A59E83 around 60% opacity
-              SliverToBoxAdapter(
-                child:  HomeCategoryChildRow(
-                      title: "Fashion",
 
-                      backgroundColor: AppColors.fashionColor.withOpacity(0.60),
-                      onSeeAllTap: () {
-                        Get.find<ProductController>().openCategoryWiseProducts(5);
-                      },
-                      onItemTap: (item) {
-                        Get.find<ProductController>().openCategoryWiseProducts(item.id);
-                      },
-                    ),
-
-              ),
 
               const SliverToBoxAdapter(
                 child: SizedBox(height: 14),
@@ -237,9 +221,7 @@ class HomeView extends GetView<HomeController> {
 
               // Additional product section placeholder using your existing restaurant widget
               SliverToBoxAdapter(
-
-                  child: HomeAllProductsSection(),
-
+                child: HomeAllProductsSection(),
               ),
 
               const SliverToBoxAdapter(
@@ -271,7 +253,7 @@ class _PdfStyleHomeHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
       decoration: BoxDecoration(
-        color: AppColors.primaryColor,
+        color: AppColors.secondaryColor,
         borderRadius: const BorderRadius.vertical(
           bottom: Radius.circular(22),
         ),
@@ -296,9 +278,7 @@ class _PdfStyleHomeHeader extends StatelessWidget {
                   size: 28,
                 ),
               ),
-
               const SizedBox(width: 10),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,24 +305,19 @@ class _PdfStyleHomeHeader extends StatelessWidget {
                   ],
                 ),
               ),
-
               _HeaderCircleIcon(
                 icon: Icons.messenger_outline_rounded,
                 label: "messenger",
                 onTap: onMessengerTap,
               ),
-
               const SizedBox(width: 8),
-
               _HeaderCircleIcon(
                 icon: Icons.notifications_none_rounded,
                 label: "notification",
                 badgeCount: 2,
                 onTap: onNotificationTap,
               ),
-
               const SizedBox(width: 8),
-
               _HeaderCircleIcon(
                 icon: Icons.favorite_border_rounded,
                 label: "wishlist",
@@ -350,9 +325,7 @@ class _PdfStyleHomeHeader extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 12),
-
           HomeSearchBar(
             hintText: "Search anything ...",
             onTap: onSearchTap,
@@ -405,7 +378,6 @@ class _HeaderCircleIcon extends StatelessWidget {
               size: 19,
             ),
           ),
-
           if (badgeCount > 0)
             Positioned(
               right: -2,

@@ -11,7 +11,7 @@ class SplashscreenView extends GetView<SplashscreenController> {
   Widget build(BuildContext context) {
     Get.find<SplashscreenController>();
     return Scaffold(
-      backgroundColor: AppColors.discountBlue,
+      backgroundColor: AppColors.navyDark,
       body: Container(
         height: _size.height,
         width: _size.width,
@@ -20,7 +20,7 @@ class SplashscreenView extends GetView<SplashscreenController> {
 
             Center(
               child: Image(
-                color: AppColors.offerYellow,
+
                 height: 200,
                 width: 200,
                 image: AssetImage(

@@ -99,6 +99,7 @@ class ApiClient {
   static const String completedOrders = '$baseUrl/api/orders/completed';
   static const String completedOrdersByUser =
       '$baseUrl/api/orders/completed/'; // {userId}
+
   static const String orderDetail = '$baseUrl/api/orders/details/'; // {id}
   static const String changeOrderStatus =
       '$baseUrl/api/orders/status/'; // {id}

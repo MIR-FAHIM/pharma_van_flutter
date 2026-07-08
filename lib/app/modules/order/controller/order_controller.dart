@@ -1,24 +1,38 @@
 // lib/app/modules/category/controller/category_controller.dart
 
+import 'package:ecom_user_flutter/app/models/ecom/delivery/order_detail.dart' hide OrderDetailsData;
 import 'package:ecom_user_flutter/app/models/ecom/order/cart_model.dart';
+import 'package:ecom_user_flutter/app/models/ecom/order/order_details.dart';
 import 'package:ecom_user_flutter/app/models/ecom/order/order_history_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/order/user_address_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_model.dart';
+import 'package:ecom_user_flutter/app/repositories/delivery_rep.dart';
 import 'package:ecom_user_flutter/app/repositories/order_rep.dart';
+import 'package:ecom_user_flutter/app/services/auth_service.dart';
 
 
 import 'package:get/get.dart';
 
+import '../../../routes/app_pages.dart';
+
 class OrderController extends GetxController {
   final isLoading = false.obs;
-
+  final orderId = 0.obs;
+  final orderDetails = Rxn<OrderDetailsData>();
+  final isOrderDetailsLoading = false.obs;
+  final orderDetailsError = ''.obs;
   final error = ''.obs;
   final selectedAddress = ''.obs;
+  final isLoadingDetail = false.obs;
   final totalAmount = 0.0.obs;
   final orderHistory = <OrderHistoryItem>[].obs;
   @override
   void onInit() {
-    userOrderHistoryController();
+
+    if(Get.find<AuthService>().currentUser.value.data  != null){
+      userOrderHistoryController();
+    }
+
     super.onInit();
 
   }
@@ -49,5 +63,34 @@ class OrderController extends GetxController {
       isLoading.value = false;
     }
   }
+  Future<void> getOrderDetails(dynamic orderId) async {
+    if (isOrderDetailsLoading.value) return;
 
+    isOrderDetailsLoading.value = true;
+    orderDetailsError.value = '';
+    orderDetails.value = null;
+
+    try {
+      // Change this line according to your repository method.
+      final res = await OrderRepository().orderDetail(orderId);
+
+      if (res is Map && res['status'] == 'success') {
+        final model = OrderDetailsResponse.fromJson(
+          Map<String, dynamic>.from(res),
+        );
+
+        orderDetails.value = model.data;
+
+        Get.toNamed(Routes.ORDER_DETAIL);
+      } else {
+        orderDetailsError.value = res is Map
+            ? (res['message']?.toString() ?? 'Failed to load order details')
+            : 'Failed to load order details';
+      }
+    } catch (e) {
+      orderDetailsError.value = e.toString();
+    } finally {
+      isOrderDetailsLoading.value = false;
+    }
+  }
 }

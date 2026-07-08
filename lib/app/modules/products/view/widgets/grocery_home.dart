@@ -33,7 +33,7 @@ class HomeGrocerySection extends GetView<ProductController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SectionHeader(
-              title: "Grocery",
+              title: "Suppliment & Nutrition",
               onSeeAllTap: () {
                 controller.openCategoryWiseProducts(_groceryCategoryId);
               },

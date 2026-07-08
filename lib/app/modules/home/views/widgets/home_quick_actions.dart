@@ -54,16 +54,16 @@ class HomeQuickActionsRow extends StatelessWidget {
               },
             ),
           ),
-          Expanded(
-            child: _QuickActionItem(
-              icon: Icons.workspace_premium_outlined,
-              label: "Top Seller",
-              color: _topSellerColor,
-              onTap: () {
-                Get.toNamed(Routes.SHOP_LIST);
-              },
-            ),
-          ),
+          // Expanded(
+          //   child: _QuickActionItem(
+          //     icon: Icons.workspace_premium_outlined,
+          //     label: "Top Seller",
+          //     color: _topSellerColor,
+          //     onTap: () {
+          //       Get.toNamed(Routes.SHOP_LIST);
+          //     },
+          //   ),
+          // ),
           Expanded(
             child: _QuickActionItem(
               icon: Icons.bolt_outlined,

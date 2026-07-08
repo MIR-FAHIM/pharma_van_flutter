@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ecom_user_flutter/app/models/ecom/product/category_child_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/product_detail.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/product_model.dart';
@@ -64,8 +65,12 @@ class ProductController extends GetxController {
 
   final categories = <CategoryItem>[].obs;
   final shops = <dynamic>[].obs;
-
   final selectedCategory = RxnInt();
+  final selectedSubCategory = RxnInt();
+
+  final categoryChilds = <DatumCatChild>[].obs;
+  final isCategoryChildLoading = false.obs;
+
   final selectedShop = RxnInt();
   final selectedFilter = Rx<ProductFilterOption?>(null);
 
@@ -119,6 +124,8 @@ class ProductController extends GetxController {
   // ---------------------------------------------------------------------------
 
   final categoryWisedProducts = <ProductModel>[].obs;
+
+
 
   final categoryCurrentPage = 1.obs;
   final categoryLastPage = 1.obs;
@@ -181,6 +188,7 @@ class ProductController extends GetxController {
   // ---------------------------------------------------------------------------
 
   final babyCareProducts = <ProductModel>[].obs;
+
   final groceryProducts = <ProductModel>[].obs;
   final medicineProducts = <ProductModel>[].obs;
   final healthBeautyProducts = <ProductModel>[].obs;
@@ -219,7 +227,7 @@ class ProductController extends GetxController {
   @override
   void onClose() {
     _debounce?.cancel();
-    searchCtrl.value.dispose();
+   // searchCtrl.value.dispose();
     super.onClose();
   }
 
@@ -300,6 +308,33 @@ class ProductController extends GetxController {
     }
   }
 
+  Future<void> getCategoryChildController(id) async {
+    print("i am called 568");
+
+    error.value = '';
+
+    try {
+      final res = await ProductRepository().getCategoryChild(id);
+      // Debug
+      print('Category API res 56866= $res');
+
+      if (res is Map && res['status'] == 'success') {
+        final model = CategoryChildModel.fromJson(res as Map<String, dynamic>);
+        categoryChilds.assignAll(model.data ?? <DatumCatChild>[]);
+        print('Category API res 5566= ${categoryChilds.length}');
+      } else {
+        categoryChilds.clear();
+        error.value =
+            (res is Map ? (res['message']?.toString() ?? 'Failed') : 'Failed');
+      }
+    } catch (e) {
+      categoryChilds.clear();
+      error.value = e.toString();
+    } finally {
+      //isLoading.value = false;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // ProductFilterPage Methods
   // ---------------------------------------------------------------------------
@@ -319,8 +354,33 @@ class ProductController extends GetxController {
     });
   }
 
-  void setFilterCategory(int? id) {
+  Future<void> setFilterCategory(int? id) async {
     selectedCategory.value = id;
+    selectedSubCategory.value = null;
+    categoryChilds.clear();
+
+    if (id != null) {
+      await getCategoryChilds(id);
+    }
+
+    getFilterProducts(reset: true);
+  }
+
+  void setFilterSubCategory(int? id) {
+    selectedSubCategory.value = id;
+    getFilterProducts(reset: true);
+  }
+
+  void clearFilterCategory() {
+    selectedCategory.value = null;
+    selectedSubCategory.value = null;
+    categoryChilds.clear();
+
+    getFilterProducts(reset: true);
+  }
+
+  void clearFilterSubCategory() {
+    selectedSubCategory.value = null;
     getFilterProducts(reset: true);
   }
 
@@ -332,6 +392,31 @@ class ProductController extends GetxController {
   void setFilter(ProductFilterOption? filter) {
     selectedFilter.value = filter;
     getFilterProducts(reset: true);
+  }
+
+  Future<void> getCategoryChilds(int parentCategoryId) async {
+    if (isCategoryChildLoading.value) return;
+
+    isCategoryChildLoading.value = true;
+    categoryChilds.clear();
+
+    try {
+      final res = await _repo.getCategoryChild(parentCategoryId);
+
+      if (res is Map && res['status'] == 'success') {
+        final model = CategoryChildModel.fromJson(
+          Map<String, dynamic>.from(res),
+        );
+
+        categoryChilds.assignAll(model.data ?? <DatumCatChild>[]);
+      } else {
+        categoryChilds.clear();
+      }
+    } catch (e) {
+      categoryChilds.clear();
+    } finally {
+      isCategoryChildLoading.value = false;
+    }
   }
 
   Future<void> getFilterProducts({bool reset = false}) async {
@@ -358,11 +443,14 @@ class ProductController extends GetxController {
     try {
       final pageToLoad = reset ? 1 : filterCurrentPage.value;
 
+      final effectiveCategoryId =
+          selectedSubCategory.value ?? selectedCategory.value;
+
       final res = await _repo.getFilterProducts(
         page: pageToLoad,
         perPage: 20,
         shopId: selectedShop.value,
-        categoryId: selectedCategory.value,
+        categoryId: effectiveCategoryId,
         isActive: selectedFilter.value?.isActive,
         search: _searchParam,
       );
@@ -405,18 +493,33 @@ class ProductController extends GetxController {
   // CategoryWisedProducts Methods
   // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// CategoryWisedProducts Methods
+// ---------------------------------------------------------------------------
+
   void initCategoryWiseProductsPage({bool forceRefresh = false}) {
     if (isCategoryPageLoaded.value && !forceRefresh) return;
 
     isCategoryPageLoaded.value = true;
+
+    if (selectedCategory.value != null && categoryChilds.isEmpty) {
+      getCategoryChilds(selectedCategory.value!);
+    }
+
     getCategoryWiseProduct(reset: true);
   }
 
   void openCategoryWiseProducts(int? id) {
     selectedCategory.value = id;
+    selectedSubCategory.value = null;
     categoryId.value = id;
+    categoryChilds.clear();
 
     clearSearch();
+
+    if (id != null) {
+      getCategoryChilds(id);
+    }
 
     isCategoryPageLoaded.value = true;
     getCategoryWiseProduct(reset: true);
@@ -424,10 +527,35 @@ class ProductController extends GetxController {
     Get.toNamed(Routes.CATEGORY_WISE_PRODUCT);
   }
 
-  void setCategoryWiseCategory(int? id) {
+  Future<void> setCategoryWiseCategory(int? id) async {
     selectedCategory.value = id;
+    selectedSubCategory.value = null;
     categoryId.value = id;
+    categoryChilds.clear();
 
+    if (id != null) {
+      await getCategoryChilds(id);
+    }
+
+    getCategoryWiseProduct(reset: true);
+  }
+
+  void setCategoryWiseSubCategory(int? id) {
+    selectedSubCategory.value = id;
+    getCategoryWiseProduct(reset: true);
+  }
+
+  void clearCategoryWiseCategory() {
+    selectedCategory.value = null;
+    selectedSubCategory.value = null;
+    categoryId.value = null;
+    categoryChilds.clear();
+
+    getCategoryWiseProduct(reset: true);
+  }
+
+  void clearCategoryWiseSubCategory() {
+    selectedSubCategory.value = null;
     getCategoryWiseProduct(reset: true);
   }
 
@@ -468,11 +596,14 @@ class ProductController extends GetxController {
     try {
       final pageToLoad = reset ? 1 : categoryCurrentPage.value;
 
+      final effectiveCategoryId =
+          selectedSubCategory.value ?? selectedCategory.value;
+
       final res = await _repo.getFilterProducts(
         page: pageToLoad,
         perPage: 20,
         shopId: selectedShop.value,
-        categoryId: selectedCategory.value,
+        categoryId: effectiveCategoryId,
         isActive: selectedFilter.value?.isActive,
         search: _searchParam,
       );
@@ -509,12 +640,6 @@ class ProductController extends GetxController {
     if (!hasMoreCategoryProducts.value) return;
 
     await getCategoryWiseProduct(reset: false);
-  }
-
-  // Backward compatibility.
-  // Use this only from category cards that should open the category-wise page.
-  void setCategory(int? id) {
-    openCategoryWiseProducts(id);
   }
 
   // ---------------------------------------------------------------------------
@@ -792,10 +917,19 @@ class ProductController extends GetxController {
 // Today Deal Products Methods
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Today Deal Products Methods
+// ---------------------------------------------------------------------------
+
   void initTodayDealProductsPage({bool forceRefresh = false}) {
     if (isTodayDealPageLoaded.value && !forceRefresh) return;
 
     isTodayDealPageLoaded.value = true;
+
+    if (selectedCategory.value != null && categoryChilds.isEmpty) {
+      getCategoryChilds(selectedCategory.value!);
+    }
+
     getTodayDealProducts(reset: true);
   }
 
@@ -803,7 +937,10 @@ class ProductController extends GetxController {
     clearSearch();
 
     selectedCategory.value = null;
+    selectedSubCategory.value = null;
     selectedShop.value = null;
+    selectedFilter.value = null;
+    categoryChilds.clear();
 
     isTodayDealPageLoaded.value = true;
     getTodayDealProducts(reset: true);
@@ -811,8 +948,33 @@ class ProductController extends GetxController {
     Get.toNamed(Routes.TODAY_DEAL_PRODUCT);
   }
 
-  void setTodayDealCategory(int? id) {
+  Future<void> setTodayDealCategory(int? id) async {
     selectedCategory.value = id;
+    selectedSubCategory.value = null;
+    categoryChilds.clear();
+
+    if (id != null) {
+      await getCategoryChilds(id);
+    }
+
+    getTodayDealProducts(reset: true);
+  }
+
+  void setTodayDealSubCategory(int? id) {
+    selectedSubCategory.value = id;
+    getTodayDealProducts(reset: true);
+  }
+
+  void clearTodayDealCategory() {
+    selectedCategory.value = null;
+    selectedSubCategory.value = null;
+    categoryChilds.clear();
+
+    getTodayDealProducts(reset: true);
+  }
+
+  void clearTodayDealSubCategory() {
+    selectedSubCategory.value = null;
     getTodayDealProducts(reset: true);
   }
 
@@ -853,12 +1015,15 @@ class ProductController extends GetxController {
     try {
       final pageToLoad = reset ? 1 : todayDealCurrentPage.value;
 
+      final effectiveCategoryId =
+          selectedSubCategory.value ?? selectedCategory.value;
+
       final res = await _repo.getTodayDealProducts(
         page: pageToLoad,
         perPage: 20,
         shopId: selectedShop.value,
-        categoryId: selectedCategory.value,
-        isActive: selectedFilter.value?.isActive,
+        categoryId: effectiveCategoryId,
+        isActive: null,
         search: _searchParam,
       );
 
@@ -939,7 +1104,9 @@ class ProductController extends GetxController {
     if (isCartLoading.value) return;
 
     isCartLoading.value = true;
-
+   if(Get.find<AuthService>().currentUser.value.data == null){
+     Get.toNamed(Routes.LOGIN);
+   }
     final userId =
         Get.find<AuthService>().currentUser.value.data?.user?.id.toString();
 

@@ -1,145 +1,38 @@
 // lib/app/modules/products/view/category_wised_products.dart
 
+import 'package:ecom_user_flutter/app/models/ecom/product/category_child_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_model.dart';
+import 'package:ecom_user_flutter/app/modules/products/controller/product_controller.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/widgets/product_card_widget.dart';
+import 'package:ecom_user_flutter/common/Color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'package:ecom_user_flutter/app/modules/products/controller/product_controller.dart';
 
 class CategoryWisedProducts extends GetView<ProductController> {
   const CategoryWisedProducts({super.key});
 
-  static const Color _navy = Color(0xFF1F214C);
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.initCategoryWiseProductsPage();
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.scaffoldBackground,
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 10),
+            _HeaderSearch(controller: controller),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: TextField(
-                controller: controller.searchCtrl.value,
-                onChanged: controller.onSearchChangedCategoryWise,
-                decoration: InputDecoration(
-                  hintText: 'Search anything...',
-                  suffixIcon: const Icon(Icons.search),
-                  prefixIcon: InkWell(
-                    onTap: () => Get.back(),
-                    child: const Icon(Icons.arrow_back),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 14,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
+            _FilterArea(controller: controller),
 
-            const SizedBox(height: 12),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Obx(() {
-                      final categories = controller.categories;
-
-                      return _DropBox<CategoryItem>(
-                        hint: "Product",
-                        value: controller.selectedCategory.value == null
-                            ? null
-                            : categories.firstWhereOrNull(
-                              (e) =>
-                          e.id == controller.selectedCategory.value,
-                        ),
-                        items: categories,
-                        labelOf: (c) => (c.name ?? "Category").trim(),
-                        onChanged: (v) {
-                          controller.setCategoryWiseCategory(v?.id);
-                        },
-                      );
-                    }),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: Obx(() {
-                      final shops = controller.shops;
-
-                      return _DropBox<dynamic>(
-                        hint: "Seller",
-                        value: controller.selectedShop.value == null
-                            ? null
-                            : shops.firstWhereOrNull(
-                              (e) => e.id == controller.selectedShop.value,
-                        ),
-                        items: shops,
-                        labelOf: (s) => (s.name ?? "Seller").toString(),
-                        onChanged: (v) {
-                          controller.setCategoryWiseShop(v?.id);
-                        },
-                      );
-                    }),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Obx(() {
-                return Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "Products",
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      "${controller.categoryTotal.value}",
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: _navy,
-                      ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-
-            const SizedBox(height: 10),
+            _ResultHeader(controller: controller),
 
             Expanded(
               child: Obx(() {
                 if (controller.isCategoryLoading.value &&
                     controller.categoryWisedProducts.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const _ProductGridSkeleton();
                 }
 
                 if (controller.error.value.isNotEmpty &&
@@ -157,30 +50,29 @@ class CategoryWisedProducts extends GetView<ProductController> {
                 }
 
                 return NotificationListener<ScrollNotification>(
-                  onNotification: (sn) {
-                    if (sn.metrics.axis == Axis.vertical &&
-                        sn.metrics.pixels >=
-                            sn.metrics.maxScrollExtent - 250) {
+                  onNotification: (notification) {
+                    if (notification.metrics.axis == Axis.vertical &&
+                        notification.metrics.pixels >=
+                            notification.metrics.maxScrollExtent - 250) {
                       controller.loadMoreCategoryWiseProducts();
                     }
 
                     return false;
                   },
                   child: RefreshIndicator(
+                    color: AppColors.primaryColor,
                     onRefresh: () async {
                       await controller.getCategoryWiseProduct(reset: true);
                     },
                     child: GridView.builder(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 8,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 18),
                       physics: const AlwaysScrollableScrollPhysics(
                         parent: BouncingScrollPhysics(),
                       ),
                       itemCount: controller.categoryWisedProducts.length +
                           (controller.isCategoryMoreLoading.value ? 1 : 0),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
@@ -199,10 +91,9 @@ class CategoryWisedProducts extends GetView<ProductController> {
                           );
                         }
 
-                        final product =
-                        controller.categoryWisedProducts[index];
-
-                        return ProductCard(product: product);
+                        return ProductCard(
+                          product: controller.categoryWisedProducts[index],
+                        );
                       },
                     ),
                   ),
@@ -216,6 +107,323 @@ class CategoryWisedProducts extends GetView<ProductController> {
   }
 }
 
+class _HeaderSearch extends StatelessWidget {
+  const _HeaderSearch({
+    required this.controller,
+  });
+
+  final ProductController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.primaryColor,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              InkWell(
+                borderRadius: BorderRadius.circular(30),
+                onTap: () => Get.back(),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.16),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_rounded,
+                    color: AppColors.offerYellow,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Category Products',
+                  style: TextStyle(
+                    color: AppColors.textWhite,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 19,
+                  ),
+                ),
+              ),
+              Obx(() {
+                return Text(
+                  '${controller.categoryTotal.value}',
+                  style: TextStyle(
+                    color: AppColors.offerYellow,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
+                );
+              }),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          TextField(
+            controller: controller.searchCtrl.value,
+            onChanged: controller.onSearchChangedCategoryWise,
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Search anything...',
+              prefixIcon: Icon(
+                Icons.search_rounded,
+                color: AppColors.primaryColor,
+              ),
+              suffixIcon: Obx(() {
+                final hasSearch = controller.search.value.trim().isNotEmpty;
+
+                if (!hasSearch) {
+                  return Icon(
+                    Icons.tune_rounded,
+                    color: AppColors.textMuted,
+                  );
+                }
+
+                return InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () {
+                    controller.clearSearch();
+                    controller.getCategoryWiseProduct(reset: true);
+                  },
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: AppColors.textMuted,
+                  ),
+                );
+              }),
+              filled: true,
+              fillColor: AppColors.backgroundColor,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 13,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterArea extends StatelessWidget {
+  const _FilterArea({
+    required this.controller,
+  });
+
+  final ProductController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.backgroundColor,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Obx(() {
+                  final categories = controller.categories;
+
+                  return _DropBox<CategoryItem>(
+                    hint: 'Category',
+                    value: controller.selectedCategory.value == null
+                        ? null
+                        : categories.firstWhereOrNull(
+                          (item) =>
+                      item.id == controller.selectedCategory.value,
+                    ),
+                    items: categories,
+                    labelOf: (item) => (item.name ?? 'Category').trim(),
+                    onChanged: (item) {
+                      controller.setCategoryWiseCategory(item?.id);
+                    },
+                  );
+                }),
+              ),
+
+              const SizedBox(width: 10),
+
+              Expanded(
+                child: Obx(() {
+                  final subCategories = controller.categoryChilds;
+
+                  return _DropBox<DatumCatChild>(
+                    hint: controller.selectedCategory.value == null
+                        ? 'Select category first'
+                        : controller.isCategoryChildLoading.value
+                        ? 'Loading...'
+                        : 'Sub Category',
+                    value: controller.selectedSubCategory.value == null
+                        ? null
+                        : subCategories.firstWhereOrNull(
+                          (item) =>
+                      item.id ==
+                          controller.selectedSubCategory.value,
+                    ),
+                    items: subCategories,
+                    labelOf: (item) => item.name.trim(),
+                    enabled: controller.selectedCategory.value != null &&
+                        !controller.isCategoryChildLoading.value,
+                    onChanged: (item) {
+                      controller.setCategoryWiseSubCategory(item?.id);
+                    },
+                  );
+                }),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          Obx(() {
+            final shops = controller.shops;
+
+            return _DropBox<dynamic>(
+              hint: 'Seller',
+              value: controller.selectedShop.value == null
+                  ? null
+                  : shops.firstWhereOrNull(
+                    (item) => item.id == controller.selectedShop.value,
+              ),
+              items: shops,
+              labelOf: (item) => (item.name ?? 'Seller').toString(),
+              onChanged: (item) {
+                controller.setCategoryWiseShop(item?.id);
+              },
+            );
+          }),
+
+          const SizedBox(height: 8),
+
+          Obx(() {
+            final hasCategory = controller.selectedCategory.value != null;
+            final hasSubCategory = controller.selectedSubCategory.value != null;
+            final hasShop = controller.selectedShop.value != null;
+            final hasSearch = controller.search.value.trim().isNotEmpty;
+
+            if (!hasCategory && !hasSubCategory && !hasShop && !hasSearch) {
+              return const SizedBox.shrink();
+            }
+
+            return Row(
+              children: [
+                Expanded(
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      if (hasCategory)
+                        _FilterChipButton(
+                          label: 'Category selected',
+                          onDeleted: controller.clearCategoryWiseCategory,
+                        ),
+                      if (hasSubCategory)
+                        _FilterChipButton(
+                          label: 'Sub-category selected',
+                          onDeleted: controller.clearCategoryWiseSubCategory,
+                        ),
+                      if (hasShop)
+                        _FilterChipButton(
+                          label: 'Seller selected',
+                          onDeleted: () {
+                            controller.setCategoryWiseShop(null);
+                          },
+                        ),
+                      if (hasSearch)
+                        _FilterChipButton(
+                          label: controller.search.value,
+                          onDeleted: () {
+                            controller.clearSearch();
+                            controller.getCategoryWiseProduct(reset: true);
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+
+                TextButton(
+                  onPressed: () {
+                    controller.selectedCategory.value = null;
+                    controller.selectedSubCategory.value = null;
+                    controller.selectedShop.value = null;
+                    controller.categoryId.value = null;
+                    controller.categoryChilds.clear();
+                    controller.clearSearch();
+                    controller.getCategoryWiseProduct(reset: true);
+                  },
+                  child: Text(
+                    'Clear All',
+                    style: TextStyle(
+                      color: AppColors.primaryColor,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResultHeader extends StatelessWidget {
+  const _ResultHeader({
+    required this.controller,
+  });
+
+  final ProductController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.scaffoldBackground,
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 2),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Products',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          Obx(() {
+            return Text(
+              '${controller.categoryTotal.value} found',
+              style: TextStyle(
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.w900,
+                fontSize: 12,
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
 class _DropBox<T> extends StatelessWidget {
   const _DropBox({
     required this.hint,
@@ -223,6 +431,7 @@ class _DropBox<T> extends StatelessWidget {
     required this.items,
     required this.labelOf,
     required this.onChanged,
+    this.enabled = true,
   });
 
   final String hint;
@@ -230,52 +439,154 @@ class _DropBox<T> extends StatelessWidget {
   final List<T> items;
   final String Function(T) labelOf;
   final void Function(T?) onChanged;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 44,
+      height: 46,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        color: enabled
+            ? AppColors.backgroundColor
+            : AppColors.scaffoldBackground,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.borderColor,
+          width: 0.9,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           isExpanded: true,
-          value: value,
+          value: enabled ? value : null,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: enabled ? AppColors.primaryColor : AppColors.textMuted,
+          ),
           hint: Text(
             hint,
-            style: const TextStyle(
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: AppColors.textMuted,
               fontWeight: FontWeight.w800,
-              color: Colors.black54,
-              fontSize: 13,
+              fontSize: 11,
             ),
           ),
           items: [
-             DropdownMenuItem<T>(
+            DropdownMenuItem<T>(
               value: null,
               child: Text(
-                "All",
-                style: TextStyle(fontWeight: FontWeight.w800),
+                'All',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                ),
               ),
             ),
-            ...items.map((e) {
+            ...items.map((item) {
               return DropdownMenuItem<T>(
-                value: e,
+                value: item,
                 child: Text(
-                  labelOf(e),
+                  labelOf(item),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w800),
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                  ),
                 ),
               );
             }),
           ],
-          onChanged: onChanged,
+          onChanged: enabled ? onChanged : null,
         ),
       ),
+    );
+  }
+}
+
+class _FilterChipButton extends StatelessWidget {
+  const _FilterChipButton({
+    required this.label,
+    required this.onDeleted,
+  });
+
+  final String label;
+  final VoidCallback onDeleted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 155),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: AppColors.primaryColor.withOpacity(0.18),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.w900,
+                fontSize: 10,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          InkWell(
+            onTap: onDeleted,
+            child: Icon(
+              Icons.close_rounded,
+              size: 14,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProductGridSkeleton extends StatelessWidget {
+  const _ProductGridSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 18),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 12,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 0.58,
+      ),
+      itemBuilder: (_, __) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: AppColors.borderColor,
+              width: 0.8,
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -297,20 +608,20 @@ class _EmptyState extends StatelessWidget {
               color: Colors.grey.shade400,
             ),
             const SizedBox(height: 10),
-            const Text(
-              "No products found",
+            Text(
+              'No products found',
               style: TextStyle(
                 fontWeight: FontWeight.w900,
-                color: Colors.black87,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
-              "Try changing search or filters.",
+            Text(
+              'Try changing category, sub-category, seller, or search.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Colors.black54,
+                color: AppColors.textSecondary,
               ),
             ),
           ],
@@ -340,15 +651,15 @@ class _ErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w800,
-                color: Colors.black87,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: onRetry,
-              child: const Text("Retry"),
+              child: const Text('Retry'),
             ),
           ],
         ),

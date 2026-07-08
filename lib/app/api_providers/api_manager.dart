@@ -7,13 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:ecom_user_flutter/app/api_providers/customExceptions.dart';
 
 class APIManager {
-
-
   Future<dynamic> postAPICallWithHeader(
       String url, var param, Map<String, String> headerData) async {
     print("Calling API: $url");
     print("Calling parameters: $param");
-    headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
+    //  headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
 
     print("Calling header: $headerData");
 
@@ -69,7 +67,7 @@ class APIManager {
     print("Calling API: $url");
     print("Calling parameters: $param");
     Map<String, String> headerData = {};
-    headerData["Authorization"] = 'Bearer ${Get.find<AuthService>().currentUser.value.data!.token!}';
+    // headerData["Authorization"] = 'Bearer ${Get.find<AuthService>().currentUser.value.data!.token!}';
     print("Calling header: $headerData");
     var responseJson;
     try {
@@ -173,7 +171,7 @@ class APIManager {
   Future<dynamic> get(String url) async {
     print("Calling API: $url");
     Map<String, String> headerData = {};
-    headerData["token"] = Get.find<AuthService>().currentUser.value.data!.token!;
+    //   headerData["token"] = Get.find<AuthService>().currentUser.value.data!.token!;
     print("Calling header: $headerData");
     var responseJson;
     try {
@@ -187,10 +185,9 @@ class APIManager {
   }
 
   Future<dynamic> getWithHeader(
-      String url, Map<String, String> headerData)
-  async {
+      String url, Map<String, String> headerData) async {
     print("Calling API: $url");
-    headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
+    // headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
     print('token: $headerData');
     var responseJson;
     try {
@@ -204,10 +201,9 @@ class APIManager {
   }
 
   Future<dynamic> deleteWithHeader(
-      String url, Map<String, String> headerData)
-  async {
+      String url, Map<String, String> headerData) async {
     print("Calling API: $url");
-    headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
+    //  headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
     print('token: $headerData');
     var responseJson;
     try {
@@ -219,18 +215,16 @@ class APIManager {
     }
     return responseJson;
   }
+
   Future<dynamic> getWithHeaderAndParam(
-      String url, {
-        Map<String, String>? headers,
-        Map<String, dynamic>? params,
-      }) async {
+    String url, {
+    Map<String, String>? headers,
+    Map<String, dynamic>? params,
+        String? token,
+  }) async {
     print("Calling API: $url");
 
-    final token = Get.find<AuthService>()
-        .currentUser
-        .value
-        .data!
-        .token;
+  //  final token = Get.find<AuthService>().currentUser.value.data!.token;
 
     final Map<String, String> finalHeaders = {
       'Authorization': 'Bearer $token',
@@ -241,7 +235,7 @@ class APIManager {
     // Build URI with query parameters
     final uri = Uri.parse(url).replace(
       queryParameters: params?.map(
-            (key, value) => MapEntry(key, value.toString()),
+        (key, value) => MapEntry(key, value.toString()),
       ),
     );
 
@@ -256,11 +250,11 @@ class APIManager {
       throw FetchDataException('No Internet connection');
     }
   }
+
   Future<dynamic> putWithHeader(
-      String url, Map<String, String> headerData)
-  async {
+      String url, Map<String, String> headerData) async {
     print("Calling API: $url");
-    headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
+    //  headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
     print('token: $headerData');
     var responseJson;
     try {
@@ -272,10 +266,11 @@ class APIManager {
     }
     return responseJson;
   }
- Future<dynamic> patchWithHeader(
+
+  Future<dynamic> patchWithHeader(
       String url, Map<String, String> headerData) async {
     print("Calling API: $url");
-    headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
+    // headerData["Authorization"] = "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}";
     print('token: $headerData');
     var responseJson;
     try {
@@ -295,18 +290,22 @@ class APIManager {
       case 200:
         var responseJson = json.decode(response.body.toString());
         return responseJson;
-        case 201:
+      case 201:
         var responseJson = json.decode(response.body.toString());
         return responseJson;
-        case 450:
+      case 450:
+        var responseJson = json.decode(response.body.toString());
+        return responseJson;
+
+        case 422:
         var responseJson = json.decode(response.body.toString());
         return responseJson;
       case 400:
         throw BadRequestException(response.body.toString());
       case 401:
       case 403:
-      var responseJson = json.decode(response.body.toString());
-      return responseJson;
+        var responseJson = json.decode(response.body.toString());
+        return responseJson;
       case 500:
         throw UnauthorisedException(response.body.toString());
       default:

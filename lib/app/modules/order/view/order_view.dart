@@ -1,6 +1,7 @@
 // lib/app/modules/order/views/order_history_page.dart
 
 import 'package:ecom_user_flutter/app/models/ecom/order/order_history_model.dart';
+import 'package:ecom_user_flutter/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -83,7 +84,7 @@ class _OrderCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       onTap: () {
         // TODO: route to order detail page
-        // Get.toNamed(Routes.ORDER_DETAIL, arguments: {"id": item.id});
+       Get.find<OrderController>().getOrderDetails(item.id.toString());
       },
       child: Container(
         padding: const EdgeInsets.all(14),

@@ -16,7 +16,7 @@ class CategoryController extends GetxController {
   void onInit() {
     super.onInit();
     getCategories();
-    getCategoryChildController(5);
+
   }
 
   Future<void> getCategories() async {

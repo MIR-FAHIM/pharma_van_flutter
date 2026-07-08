@@ -24,8 +24,10 @@ class ShopController extends GetxController {
     try {
       isLoadingShops.value = true;
       error.value = '';
-
-      final response = await ProductRepository().getShop();
+  Map<String, dynamic> param = {
+    'status' : 'active'
+  };
+      final response = await ProductRepository().getShop(params: param );
 
       if (response is Map<String, dynamic>) {
         final model = ShopListResModel.fromJson(response);

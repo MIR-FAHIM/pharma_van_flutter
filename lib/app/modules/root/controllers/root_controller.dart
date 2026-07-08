@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ecom_user_flutter/app/models/ecom/notification/popup_image_notification.dart';
 import 'package:ecom_user_flutter/app/modules/home/views/home_view.dart';
+import 'package:new_version_plus/new_version_plus.dart';
 
 import '../../order/view/order_view.dart';
 
@@ -24,7 +25,7 @@ class RootController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
+    advancedStatusCheck();
 
     //
 
@@ -51,6 +52,23 @@ class RootController extends GetxController {
   ];
 
   Widget get currentPage => pages[currentIndex.value];
-
+  advancedStatusCheck() async {
+    print("hle broooooo");
+    final newVersion = NewVersionPlus(
+      androidId: 'com.pharmavan.customer',
+    );
+    var status = await newVersion.getVersionStatus();
+    print("version status ${status!.appStoreLink}");
+    if (status.canUpdate == true) {
+      print("update av");
+      newVersion.showUpdateDialog(
+        // launchMode: LaunchMode.externalApplication,
+        context: Get.context!,
+        versionStatus: status,
+        dialogTitle: 'Update Available!',
+        dialogText: 'Upgrade  ${status.localVersion} to ${status.storeVersion}',
+      );
+    }
+  }
 
 }

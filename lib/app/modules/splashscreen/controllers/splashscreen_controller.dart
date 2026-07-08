@@ -22,12 +22,12 @@ class SplashscreenController extends GetxController {
 
 
     Timer(const Duration(seconds: 3), () {
-
-      if(Get.find<AuthService>().currentUser.value.data != null){
-        Get.offAllNamed(Routes.ROOT,);
-      }else{
-        Get.offAllNamed(Routes.LOGIN,);
-      }
+      Get.offAllNamed(Routes.ROOT,);
+      // if(Get.find<AuthService>().currentUser.value.data != null){
+      //   Get.offAllNamed(Routes.ROOT,);
+      // }else{
+      //   Get.offAllNamed(Routes.LOGIN,);
+      // }
 
 
 

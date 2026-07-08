@@ -19,6 +19,10 @@ class _ProceedOrderPageState extends State<ProceedOrderPage> {
   final TextEditingController couponCtrl = TextEditingController();
 
   String selectedPayment = 'cod';
+  int isOutsideDhaka = 0;
+
+  int get shippingCharge => isOutsideDhaka == 1 ? 60 : 30;
+  num get payableTotal => controller.totalAmount.value + shippingCharge;
 
   static const Color _navy = Color(0xFF1F214C);
   static const Color _bg = Color(0xFFF7F8FA);
@@ -61,13 +65,15 @@ class _ProceedOrderPageState extends State<ProceedOrderPage> {
 
         return _CheckoutBottomBar(
           couponCtrl: couponCtrl,
-          total: controller.totalAmount.value,
+          total: payableTotal,
           enabled: hasItems,
           onApplyCoupon: _applyCoupon,
           onDetails: () => _showTotalDetailsBottomSheet(
             context,
             totalItems: items.length,
             subtotal: controller.totalAmount.value,
+            shippingCharge: shippingCharge,
+            total: payableTotal,
           ),
           onPlaceOrder: () => _placeOrder(cart),
         );
@@ -98,6 +104,25 @@ class _ProceedOrderPageState extends State<ProceedOrderPage> {
                 ),
               ),
               const SliverToBoxAdapter(child: SelectedAddress()),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                sliver: const SliverToBoxAdapter(
+                  child: _SectionHeader(title: 'Delivery area'),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                sliver: SliverToBoxAdapter(
+                  child: _DeliveryAreaCard(
+                    isOutsideDhaka: isOutsideDhaka,
+                    onChanged: (value) {
+                      setState(() {
+                        isOutsideDhaka = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 sliver: SliverToBoxAdapter(
@@ -131,6 +156,18 @@ class _ProceedOrderPageState extends State<ProceedOrderPage> {
                     ),
                   ),
                 ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                sliver: const SliverToBoxAdapter(
+                  child: _SectionHeader(title: 'Order note'),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                sliver: SliverToBoxAdapter(
+                  child: _OrderNoteCard(controller: controller.noteCtrl.value),
+                ),
+              ),
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                 sliver: const SliverToBoxAdapter(
@@ -196,6 +233,8 @@ class _ProceedOrderPageState extends State<ProceedOrderPage> {
       return;
     }
 
+    controller.isOutsideDhaka.value = isOutsideDhaka;
+    controller.shippingCharge.value = shippingCharge;
     controller.proceedToShipping();
   }
 
@@ -213,6 +252,8 @@ class _ProceedOrderPageState extends State<ProceedOrderPage> {
       BuildContext context, {
         required int totalItems,
         required num subtotal,
+        required num shippingCharge,
+        required num total,
       }) {
     showModalBottomSheet(
       context: context,
@@ -249,13 +290,169 @@ class _ProceedOrderPageState extends State<ProceedOrderPage> {
                 const SizedBox(height: 10),
                 _KeyValueRow(label: 'Subtotal', value: _money(subtotal)),
                 const SizedBox(height: 10),
+                _KeyValueRow(label: 'Shipping charge', value: _money(shippingCharge)),
+                const SizedBox(height: 10),
                 const Divider(height: 18),
-                _KeyValueRow(label: 'Total', value: _money(subtotal), strong: true),
+                _KeyValueRow(label: 'Total', value: _money(total), strong: true),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+class _OrderNoteCard extends StatelessWidget {
+  const _OrderNoteCard({required this.controller});
+
+  final TextEditingController controller;
+
+  static const Color _line = _ProceedOrderPageState._line;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _line),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.045),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        maxLines: 3,
+        minLines: 3,
+        textInputAction: TextInputAction.newline,
+        decoration: const InputDecoration(
+          hintText: 'Write order note here',
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
+      ),
+    );
+  }
+}
+
+class _DeliveryAreaCard extends StatelessWidget {
+  const _DeliveryAreaCard({
+    required this.isOutsideDhaka,
+    required this.onChanged,
+  });
+
+  final int isOutsideDhaka;
+  final ValueChanged<int> onChanged;
+
+  static const Color _line = _ProceedOrderPageState._line;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _line),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.045),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _AreaOption(
+            title: 'Next Day Delivery',
+            subtitle: 'Shipping charge ৳30',
+            selected: isOutsideDhaka == 0,
+            onTap: () => onChanged(0),
+          ),
+          const Divider(height: 14),
+          _AreaOption(
+            title: 'Same Day Delivery',
+            subtitle: 'Shipping charge ৳60',
+            selected: isOutsideDhaka == 1,
+            onTap: () => onChanged(1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AreaOption extends StatelessWidget {
+  const _AreaOption({
+    required this.title,
+    required this.subtitle,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final bool selected;
+  final VoidCallback onTap;
+
+  static const Color _navy = _ProceedOrderPageState._navy;
+  static const Color _softBeige = _ProceedOrderPageState._softBeige;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? _softBeige : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+              color: selected ? _navy : Colors.grey.shade400,
+              size: 24,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black54,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

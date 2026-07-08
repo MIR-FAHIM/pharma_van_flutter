@@ -1,7 +1,3 @@
-// lib/app/modules/home/widgets/home_banner_carousel.dart
-// Full width image banner only (no title/subtitle)
-// Uses BannerController + API response
-
 import 'package:ecom_user_flutter/app/api_providers/company_data.dart';
 import 'package:ecom_user_flutter/app/models/ecom/banner_model.dart';
 import 'package:ecom_user_flutter/app/modules/banner/controller/banner_controller.dart';

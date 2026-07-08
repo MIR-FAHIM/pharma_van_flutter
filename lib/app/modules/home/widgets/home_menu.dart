@@ -20,7 +20,7 @@ class HomeMenu extends GetWidget<HomeController> {
       width: Get.width*.3,
       height: Get.height*.1,
       decoration: BoxDecoration(
-        color: AppColors.secondbackgroundColor,
+        color: AppColors.backgroundColor,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: AppColors.primaryColor, // ✅ Solid border color

@@ -36,7 +36,7 @@ class RootView extends GetView<RootController> {
         },
         child: Scaffold(
           body: controller.currentPage,
-          endDrawer: MainDrawerWidget(),
+
           bottomNavigationBar: Obx(() {
             return SafeArea(
               top: false,

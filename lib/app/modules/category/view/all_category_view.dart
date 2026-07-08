@@ -88,7 +88,7 @@ class _CategoryTile extends StatelessWidget {
         // TODO: Navigate to category wise product page
          //Get.toNamed(Routes.CATEGORY_WISE_PRODUCT, arguments: {"id": item.id, "name": item.name});
 
-        Get.find<ProductController>().setCategory(item.id);
+        Get.find<ProductController>().setCategoryWiseCategory(item.id);
         Get.find<ProductController>().getCategoryWiseProduct(reset: true);
       },
       borderRadius: BorderRadius.circular(14),

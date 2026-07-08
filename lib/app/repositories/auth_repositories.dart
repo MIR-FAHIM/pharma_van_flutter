@@ -10,6 +10,10 @@ import 'package:ecom_user_flutter/app/services/auth_service.dart';
 
 class AuthRepository {
   final userdata = GetStorage();
+  Map<String, String> get header => {
+    'Authorization':
+    'Bearer ${Get.find<AuthService>().currentUser.value.data!.token}',
+  };
 
   ///User login api call
   userLogin(Map data) async {
@@ -34,8 +38,9 @@ class AuthRepository {
   }
 
   getProfile(String userID) async {
+
     APIManager _manager = APIManager();
-    final response = await _manager.getWithHeader(ApiClient.userDetails + userID, {});
+    final response = await _manager.getWithHeader(ApiClient.userDetails + userID, header);
 
     print('user profile: ${response}');
 

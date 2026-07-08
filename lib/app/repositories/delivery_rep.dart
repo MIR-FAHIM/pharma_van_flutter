@@ -27,10 +27,12 @@ class DeliveryRepository {
     return response;
   }
  addAddress(Map data) async {
-
+   Map<String, String> header = {
+     'Authorization' : "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}",
+   };
 
     APIManager _manager = APIManager();
-    final response = await _manager.postAPICallWithHeader(ApiClient.addAddress, data, {});
+    final response = await _manager.postAPICallWithHeader(ApiClient.addAddress, data,header);
 
     print('add address: ${response}');
 

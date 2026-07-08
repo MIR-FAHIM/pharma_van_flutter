@@ -54,9 +54,11 @@ class UserAddress extends GetWidget<CartController> {
 
             return _AddressCard(
               address: adrs.address.toString(),
+              district: adrs.district.toString(),
+              mobile: adrs.mobile.toString(),
               onTapMenu: () {
                 Get.bottomSheet(
-                  _AddressActionSheet(),
+                  _AddressActionSheet(addressId: adrs.id.toString(),),
                   backgroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.vertical(
@@ -89,10 +91,14 @@ class UserAddress extends GetWidget<CartController> {
 class _AddressCard extends StatelessWidget {
   const _AddressCard({
     required this.address,
+    required this.mobile,
+    required this.district,
     required this.onTapMenu,
   });
 
   final String address;
+  final String mobile;
+  final String district;
   final VoidCallback onTapMenu;
 
   @override
@@ -128,16 +134,47 @@ class _AddressCard extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              address.isEmpty ? 'No address details' : address,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
-                height: 1.35,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  address.isEmpty ? 'No address details' : address,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    height: 1.35,
+                  ),
+                ),
+
+                Text(
+                  mobile.isEmpty ? 'No mobile' : mobile,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    height: 1.35,
+                  ),
+                ),
+
+                Text(
+                  district.isEmpty ? 'No district' : district,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    height: 1.35,
+                  ),
+                ),
+
+
+              ],
             ),
           ),
           IconButton(
@@ -382,7 +419,11 @@ class _AddressTextField extends StatelessWidget {
   }
 }
 
-class _AddressActionSheet extends StatelessWidget {
+class _AddressActionSheet extends GetWidget<CartController> {
+final String addressId ;
+  const _AddressActionSheet ({
+  required this.addressId
+});
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -414,7 +455,7 @@ class _AddressActionSheet extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                Get.back();
+              controller.deleteUserAddress(addressId);
               },
             ),
           ],

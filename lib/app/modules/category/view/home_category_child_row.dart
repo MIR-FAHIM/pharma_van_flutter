@@ -38,7 +38,7 @@ class HomeCategoryChildRow extends GetView<CategoryController> {
         }
         return Container(
           width: double.infinity,
-          color: backgroundColor ?? AppColors.fashionColor.withOpacity(0.60),
+          color: backgroundColor ?? AppColors.primaryDarkGreen.withOpacity(0.60),
           padding: const EdgeInsets.fromLTRB(0, 12, 0, 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

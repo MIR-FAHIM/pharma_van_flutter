@@ -29,11 +29,18 @@ class ProductRepository {
 
     return response;
   }
-getShop() async {
+  getShop({Map<String, dynamic>? params}) async {
     APIManager _manager = APIManager();
-    final response = await _manager.getWithHeader(ApiClient.listShops, {});
 
-    print('getShop 3453: ${response}');
+    final uri = Uri.parse(ApiClient.listShops).replace(
+      queryParameters: params?.map(
+            (key, value) => MapEntry(key, value.toString()),
+      ),
+    );
+
+    final response = await _manager.getWithHeader(uri.toString(), {});
+
+    print('getShop 3453: $response');
 
     return response;
   }
@@ -47,10 +54,14 @@ getBrands() async {
   }
 
   addToCart(data) async {
+    Map<String, String> header = {
+      'Authorization' : "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}",
+    };
     APIManager _manager = APIManager();
-    final response = await _manager.postAPICall(
+    final response = await _manager.postAPICallWithHeader(
       ApiClient.addToCart,
       data,
+        header
     );
 
     print('addToCart 544: ${response}');

@@ -62,7 +62,7 @@ class WelcomeView extends GetView<WelcomeController> {
           ),
         ),
       ),
-        backgroundColor: AppColors.secondbackgroundColor,
+        backgroundColor: AppColors.primaryDarkGreen,
         body: SingleChildScrollView(
 
           child: Container(

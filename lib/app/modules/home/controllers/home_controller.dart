@@ -37,8 +37,12 @@ class HomeController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    userID.value = Get.find<AuthService>().currentUser.value.data!.user!.id!;
-    getProfile();
+
+    if(Get.find<AuthService>().currentUser.value.data != null){
+      userID.value = Get.find<AuthService>().currentUser.value.data!.user!.id!;
+      getProfile();
+    }
+
 
     super.onInit();
     print('HomeController.onInit');

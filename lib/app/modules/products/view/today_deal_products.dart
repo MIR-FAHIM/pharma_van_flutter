@@ -1,5 +1,6 @@
 // lib/app/modules/products/view/today_deal_products.dart
 
+import 'package:ecom_user_flutter/app/models/ecom/product/category_child_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_model.dart';
 import 'package:ecom_user_flutter/app/modules/products/controller/product_controller.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/widgets/product_card_widget.dart';
@@ -144,7 +145,7 @@ class _TodayDealHeader extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.todayDealColor,
+                  AppColors.primaryDarkGreen,
                   AppColors.primaryColor,
                 ],
                 begin: Alignment.topLeft,
@@ -239,17 +240,28 @@ class _TodayDealHeader extends StatelessWidget {
                       Icons.search_rounded,
                       color: AppColors.primaryColor,
                     ),
-                    suffixIcon: InkWell(
-                      borderRadius: BorderRadius.circular(30),
-                      onTap: () {
-                        controller.clearSearch();
-                        controller.getTodayDealProducts(reset: true);
-                      },
-                      child: Icon(
-                        Icons.close_rounded,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
+                    suffixIcon: Obx(() {
+                      final hasSearch = controller.search.value.trim().isNotEmpty;
+
+                      if (!hasSearch) {
+                        return Icon(
+                          Icons.tune_rounded,
+                          color: AppColors.textMuted,
+                        );
+                      }
+
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(30),
+                        onTap: () {
+                          controller.clearSearch();
+                          controller.getTodayDealProducts(reset: true);
+                        },
+                        child: Icon(
+                          Icons.close_rounded,
+                          color: AppColors.textMuted,
+                        ),
+                      );
+                    }),
                     filled: true,
                     fillColor: AppColors.backgroundColor,
                     contentPadding: const EdgeInsets.symmetric(
@@ -266,65 +278,177 @@ class _TodayDealHeader extends StatelessWidget {
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-            child: Row(
+          _TodayDealFilterArea(controller: controller),
+        ],
+      ),
+    );
+  }
+
+
+}
+class _TodayDealFilterArea extends StatelessWidget {
+  const _TodayDealFilterArea({
+    required this.controller,
+  });
+
+  final ProductController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.backgroundColor,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Obx(() {
+                  final categories = controller.categories;
+
+                  return _DropBox<CategoryItem>(
+                    hint: "Category",
+                    value: controller.selectedCategory.value == null
+                        ? null
+                        : categories.firstWhereOrNull(
+                          (item) =>
+                      item.id == controller.selectedCategory.value,
+                    ),
+                    items: categories,
+                    labelOf: (item) => (item.name ?? "Category").trim(),
+                    onChanged: (item) {
+                      controller.setTodayDealCategory(item?.id);
+                    },
+                  );
+                }),
+              ),
+
+              const SizedBox(width: 10),
+
+              Expanded(
+                child: Obx(() {
+                  final subCategories = controller.categoryChilds;
+
+                  return _DropBox<DatumCatChild>(
+                    hint: controller.selectedCategory.value == null
+                        ? "Select category first"
+                        : controller.isCategoryChildLoading.value
+                        ? "Loading..."
+                        : "Sub Category",
+                    value: controller.selectedSubCategory.value == null
+                        ? null
+                        : subCategories.firstWhereOrNull(
+                          (item) =>
+                      item.id ==
+                          controller.selectedSubCategory.value,
+                    ),
+                    items: subCategories,
+                    labelOf: (item) => item.name.trim(),
+                    enabled: controller.selectedCategory.value != null &&
+                        !controller.isCategoryChildLoading.value,
+                    onChanged: (item) {
+                      controller.setTodayDealSubCategory(item?.id);
+                    },
+                  );
+                }),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          Obx(() {
+            final shops = controller.shops;
+
+            return _DropBox<dynamic>(
+              hint: "Seller",
+              value: controller.selectedShop.value == null
+                  ? null
+                  : shops.firstWhereOrNull(
+                    (item) => item.id == controller.selectedShop.value,
+              ),
+              items: shops,
+              labelOf: (item) => (item.name ?? "Seller").toString(),
+              onChanged: (item) {
+                controller.setTodayDealShop(item?.id);
+              },
+            );
+          }),
+
+          const SizedBox(height: 8),
+
+          Obx(() {
+            final hasCategory = controller.selectedCategory.value != null;
+            final hasSubCategory = controller.selectedSubCategory.value != null;
+            final hasShop = controller.selectedShop.value != null;
+            final hasSearch = controller.search.value.trim().isNotEmpty;
+
+            if (!hasCategory && !hasSubCategory && !hasShop && !hasSearch) {
+              return const SizedBox.shrink();
+            }
+
+            return Row(
               children: [
                 Expanded(
-                  child: Obx(() {
-                    final categories = controller.categories;
-
-                    return _DropBox<CategoryItem>(
-                      hint: "Product",
-                      value: controller.selectedCategory.value == null
-                          ? null
-                          : categories.firstWhereOrNull(
-                            (item) =>
-                        item.id ==
-                            controller.selectedCategory.value,
-                      ),
-                      items: categories,
-                      labelOf: (item) =>
-                          (item.name ?? "Category").trim(),
-                      onChanged: (item) {
-                        controller.setTodayDealCategory(item?.id);
-                      },
-                    );
-                  }),
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      if (hasCategory)
+                        _FilterChipButton(
+                          label: "Category selected",
+                          onDeleted: controller.clearTodayDealCategory,
+                        ),
+                      if (hasSubCategory)
+                        _FilterChipButton(
+                          label: "Sub-category selected",
+                          onDeleted: controller.clearTodayDealSubCategory,
+                        ),
+                      if (hasShop)
+                        _FilterChipButton(
+                          label: "Seller selected",
+                          onDeleted: () {
+                            controller.setTodayDealShop(null);
+                          },
+                        ),
+                      if (hasSearch)
+                        _FilterChipButton(
+                          label: controller.search.value,
+                          onDeleted: () {
+                            controller.clearSearch();
+                            controller.getTodayDealProducts(reset: true);
+                          },
+                        ),
+                    ],
+                  ),
                 ),
 
-                const SizedBox(width: 10),
-
-                Expanded(
-                  child: Obx(() {
-                    final shops = controller.shops;
-
-                    return _DropBox<dynamic>(
-                      hint: "Seller",
-                      value: controller.selectedShop.value == null
-                          ? null
-                          : shops.firstWhereOrNull(
-                            (item) =>
-                        item.id == controller.selectedShop.value,
-                      ),
-                      items: shops,
-                      labelOf: (item) =>
-                          (item.name ?? "Seller").toString(),
-                      onChanged: (item) {
-                        controller.setTodayDealShop(item?.id);
-                      },
-                    );
-                  }),
+                TextButton(
+                  onPressed: () {
+                    controller.selectedCategory.value = null;
+                    controller.selectedSubCategory.value = null;
+                    controller.selectedShop.value = null;
+                    controller.categoryChilds.clear();
+                    controller.clearSearch();
+                    controller.getTodayDealProducts(reset: true);
+                  },
+                  child: Text(
+                    "Clear All",
+                    style: TextStyle(
+                      color: AppColors.primaryColor,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 11,
+                    ),
+                  ),
                 ),
               ],
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
   }
 }
-
 class _DropBox<T> extends StatelessWidget {
   const _DropBox({
     required this.hint,
@@ -332,6 +456,7 @@ class _DropBox<T> extends StatelessWidget {
     required this.items,
     required this.labelOf,
     required this.onChanged,
+    this.enabled = true,
   });
 
   final String hint;
@@ -339,6 +464,7 @@ class _DropBox<T> extends StatelessWidget {
   final List<T> items;
   final String Function(T) labelOf;
   final void Function(T?) onChanged;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -346,27 +472,31 @@ class _DropBox<T> extends StatelessWidget {
       height: 46,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: AppColors.backgroundColor,
+        color: enabled
+            ? AppColors.backgroundColor
+            : AppColors.scaffoldBackground,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: AppColors.borderColor,
-          width: 0.8,
+          width: 0.9,
         ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           isExpanded: true,
-          value: value,
+          value: enabled ? value : null,
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: AppColors.primaryColor,
+            color: enabled ? AppColors.primaryColor : AppColors.textMuted,
           ),
           hint: Text(
             hint,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: AppColors.textMuted,
               fontWeight: FontWeight.w800,
-              fontSize: 12,
+              fontSize: 11,
             ),
           ),
           items: [
@@ -397,13 +527,62 @@ class _DropBox<T> extends StatelessWidget {
               );
             }),
           ],
-          onChanged: onChanged,
+          onChanged: enabled ? onChanged : null,
         ),
       ),
     );
   }
 }
+class _FilterChipButton extends StatelessWidget {
+  const _FilterChipButton({
+    required this.label,
+    required this.onDeleted,
+  });
 
+  final String label;
+  final VoidCallback onDeleted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 155),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: AppColors.primaryColor.withOpacity(0.18),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.w900,
+                fontSize: 10,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          InkWell(
+            onTap: onDeleted,
+            child: Icon(
+              Icons.close_rounded,
+              size: 14,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 class _TodayDealGridSkeleton extends StatelessWidget {
   const _TodayDealGridSkeleton();
 
@@ -517,13 +696,13 @@ class _EmptyState extends StatelessWidget {
               width: 82,
               height: 82,
               decoration: BoxDecoration(
-                color: AppColors.todayDealColor.withOpacity(0.10),
+                color: AppColors.primaryDarkGreen.withOpacity(0.10),
                 borderRadius: BorderRadius.circular(28),
               ),
               child: Icon(
                 Icons.event_busy_outlined,
                 size: 42,
-                color: AppColors.todayDealColor,
+                color: AppColors.primaryDarkGreen,
               ),
             ),
             const SizedBox(height: 14),

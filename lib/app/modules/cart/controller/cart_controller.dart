@@ -16,6 +16,7 @@
 //
 // If your repository function names differ, keep the controller logic and only change the repo calls.
 
+import 'package:ecom_user_flutter/app/models/ecom/order/checkout_success.dart';
 import 'package:ecom_user_flutter/app/models/ecom/order/user_address_model.dart';
 import 'package:ecom_user_flutter/app/repositories/delivery_rep.dart';
 import 'package:ecom_user_flutter/app/routes/app_pages.dart';
@@ -31,14 +32,15 @@ class CartController extends GetxController {
   final error = ''.obs;
   final selectedAddressIndex = 0.obs;
   // For checkout UI
-
+  final isOutsideDhaka = 0.obs;
+  final shippingCharge = 60.obs;
   final totalAmount = 0.0.obs;
   final mobileController = TextEditingController().obs;
   final addressController = TextEditingController().obs;
   final areaController = TextEditingController().obs;
   final districtController = TextEditingController().obs;
   final isAddressAdding = false.obs;
-
+  final  noteCtrl = TextEditingController().obs;
   final userAddress = <AddressModel>[].obs;
   final cart = Rxn<CartModel>();
 
@@ -47,8 +49,12 @@ class CartController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getCart();
-    getUserAddress();
+
+    if(Get.find<AuthService>().currentUser.value.data != null){
+      getCart();
+      getUserAddress();
+    }
+
   }
   @override
   void onClose() {
@@ -57,6 +63,7 @@ class CartController extends GetxController {
     districtController.value.dispose();
     areaController.value.dispose();
     addressController.value.dispose();
+   // noteCtrl.value.dispose();
     super.onClose();
   }
   // Initial load (active cart)
@@ -204,6 +211,27 @@ class CartController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+ Future<void> deleteUserAddress(id) async {
+
+
+
+      final res = await OrderRepository().deleteUserAddress(id);
+      // Debug
+      // print('Category API res = $res');
+
+      if (res is Map && res['status'] == 'success') {
+
+        print('i am 65456 success 34');
+
+        getUserAddress();
+      } else {
+        error.value =
+            (res is Map ? (res['message']?.toString() ?? 'Failed') : 'Failed');
+      }
+
+
+
   }
 
   void clearAddressForm() {
@@ -378,6 +406,7 @@ class CartController extends GetxController {
     required String customerPhone,
     required String shippingAddress,
     required String zone,
+    required String isOutsideDhaka,
     String note = '',
   }) {
     return <String, String>{
@@ -387,6 +416,7 @@ class CartController extends GetxController {
       'shipping_address': shippingAddress,
       'zone': zone,
       'note': note,
+      'is_outside_dhaka': isOutsideDhaka,
     };
   }
 
@@ -424,43 +454,44 @@ class CartController extends GetxController {
           Get.find<AuthService>().currentUser.value.data!.user!.id.toString(),
       customerName:
           Get.find<AuthService>().currentUser.value.data!.user!.name.toString(),
-      customerPhone: Get.find<AuthService>()
-          .currentUser
-          .value
-          .data!
-          .user!
-          .phone
-          .toString(),
-      shippingAddress: 'shippingAddress',
+      customerPhone: selectedAddress.mobile.toString(),
+      shippingAddress:  selectedAddress.address?.toString() ?? 'No address details',
       zone: 'zone',
-      note: 'note',
+      note: noteCtrl.value.text.isEmpty ? 'No Note' : noteCtrl.value.text ,
+      isOutsideDhaka: isOutsideDhaka.value.toString(),
     );
 
     isLoading.value = true;
     error.value = '';
 
-    try {
+
       final res = await _repo.checkout(payload); // implement in repo
 
       if (res is Map && res['status'] == 'success') {
         // After successful checkout, refresh cart
-        await getActiveCart(reset: true);
+       await getActiveCart(reset: true);
 
+        print("i am here 4554 $res");
+       final checkoutResponse = CheckoutSuccessResponse.fromJson(
+         Map<String, dynamic>.from(res),
+       );
+
+       Get.offNamed(
+         Routes.CHECKOUT_SUCCESS,
+         arguments: checkoutResponse,
+       );
         // Navigate if you want:
         Get.offNamed(Routes.CHECKOUT_SUCCESS, arguments: {
-          'order_id': res['data']['order_number'],
-          'amount': res['data']['total']
+          'order_id': res['data'][0]['order_number'],
+          'amount': res['data'][0]['total'].toString(),
         });
-      } else {
+      }
+      else {
+        print("i am here 4554 ");
         error.value =
             (res is Map ? (res['message']?.toString() ?? 'Failed') : 'Failed');
         Get.snackbar('Order', error.value);
       }
-    } catch (e) {
-      error.value = e.toString();
-      Get.snackbar('Order', error.value);
-    } finally {
-      isLoading.value = false;
-    }
+
   }
 }
