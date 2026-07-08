@@ -77,7 +77,8 @@ class ApiClient {
   static const String updateShop = '$baseUrl/api/shops/update/'; // {id}
   static const String updateShopStatus = '$baseUrl/api/shops/status/'; // {id}
   static const String deleteShop = '$baseUrl/api/shops/delete/'; // {id}
-
+  // Route::get('/divisions', [DeliveryAddressController::class, 'getDivisions']);
+  // Route::get('/districts/{divisionId}', [DeliveryAddressController::class, 'getDistrictsByDivision']);
   // ==============================
   // CART
   // ==============================
