@@ -14,6 +14,18 @@ class ApiClient {
   static const String revokeToken = '$baseUrl/api/auth/tokens/'; // {id}
 
   // ==============================
+  // LOCATIONS
+  // ==============================
+  static const String locationBaseUrl =
+      'https://myzooapi.myzoo.asia/public/api/locations';
+  static const String locationDivisions = '$locationBaseUrl/divisions';
+  static String locationDistricts(int divisionId) =>
+      '$locationBaseUrl/districts/$divisionId';
+  static const String pharmaLocationBaseUrl = '$baseUrl/api/locations';
+  static String locationUpazilas(int districtId) =>
+      '$pharmaLocationBaseUrl/upazilas/$districtId';
+
+  // ==============================
   // USERS
   // ==============================
   static const String createUser = '$baseUrl/api/users/create';

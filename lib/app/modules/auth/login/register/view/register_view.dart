@@ -1,6 +1,9 @@
 // lib/app/modules/auth/views/register_view.dart
 import 'dart:io';
 import 'dart:ui';
+import 'package:ecom_user_flutter/app/models/location/district_model.dart';
+import 'package:ecom_user_flutter/app/models/location/division_model.dart';
+import 'package:ecom_user_flutter/app/models/location/upazila_model.dart';
 import 'package:ecom_user_flutter/app/modules/auth/login/register/controller/register_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -76,29 +79,78 @@ class RegisterView extends GetView<RegisterController> {
                             ),
                             const SizedBox(height: 12),
                             Obx(() {
-                              return _DropdownInput<RegisterDropdownItem>(
+                              final isLoading =
+                                  controller.isDivisionLoading.value;
+                              final enabled = !isLoading &&
+                                  controller.divisions.isNotEmpty;
+
+                              return _DropdownInput<DivisionModel>(
+                                label: 'Division'.tr,
+                                hint: isLoading
+                                    ? 'Loading divisions...'.tr
+                                    : 'Select division'.tr,
+                                icon: Icons.map_outlined,
+                                value: controller.selectedDivision.value,
+                                items: controller.divisions,
+                                labelOf: (item) => item.name ?? '',
+                                onChanged:
+                                    enabled ? controller.setDivision : null,
+                                validator: controller.validateDivision,
+                              );
+                            }),
+                            const SizedBox(height: 12),
+                            Obx(() {
+                              final selectedDivision =
+                                  controller.selectedDivision.value;
+                              final isLoading =
+                                  controller.isDistrictLoading.value;
+                              final enabled = selectedDivision != null &&
+                                  !isLoading &&
+                                  controller.districts.isNotEmpty;
+
+                              return _DropdownInput<DistrictModel>(
                                 label: 'District'.tr,
-                                hint: 'Select district'.tr,
+                                hint: selectedDivision == null
+                                    ? 'Select division first'.tr
+                                    : isLoading
+                                        ? 'Loading districts...'.tr
+                                        : controller.districts.isEmpty
+                                            ? 'No district available'.tr
+                                            : 'Select district'.tr,
                                 icon: Icons.location_city_outlined,
                                 value: controller.selectedDistrict.value,
                                 items: controller.districts,
-                                labelOf: (item) => item.name,
-                                onChanged: controller.setDistrict,
+                                labelOf: (item) => item.name ?? '',
+                                onChanged:
+                                    enabled ? controller.setDistrict : null,
                                 validator: controller.validateDistrict,
                               );
                             }),
                             const SizedBox(height: 12),
                             Obx(() {
-                              return _DropdownInput<RegisterDropdownItem>(
+                              final selectedDistrict =
+                                  controller.selectedDistrict.value;
+                              final isLoading =
+                                  controller.isPoliceStationLoading.value;
+                              final hasPoliceStations =
+                                  controller.policeStations.isNotEmpty;
+
+                              return _DropdownInput<UpazilaModel>(
                                 label: 'Police Station'.tr,
-                                hint: controller.selectedDistrict.value == null
+                                hint: selectedDistrict == null
                                     ? 'Select district first'.tr
-                                    : 'Select police station'.tr,
+                                    : isLoading
+                                        ? 'Loading police stations...'.tr
+                                        : hasPoliceStations
+                                            ? 'Select police station'.tr
+                                            : 'No police station available'.tr,
                                 icon: Icons.account_balance_outlined,
                                 value: controller.selectedPoliceStation.value,
                                 items: controller.policeStations,
-                                labelOf: (item) => item.name,
-                                onChanged: controller.selectedDistrict.value == null
+                                labelOf: (item) => item.name ?? '',
+                                onChanged: selectedDistrict == null ||
+                                        isLoading ||
+                                        !hasPoliceStations
                                     ? null
                                     : controller.setPoliceStation,
                                 validator: controller.validatePoliceStation,
