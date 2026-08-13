@@ -26,7 +26,7 @@ class AllCategoryView extends GetView<CategoryController> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Get.find<RootController>().currentIndex.value = 0,
+          onPressed: () => Get.back(),
         ),
         title: Text(
           "All Categories",
@@ -88,8 +88,8 @@ class _CategoryTile extends StatelessWidget {
         // TODO: Navigate to category wise product page
          //Get.toNamed(Routes.CATEGORY_WISE_PRODUCT, arguments: {"id": item.id, "name": item.name});
 
-        Get.find<ProductController>().setCategoryWiseCategory(item.id);
-        Get.find<ProductController>().getCategoryWiseProduct(reset: true);
+       // Get.find<ProductController>().setCategoryWiseCategory(item.id);
+        Get.find<ProductController>().openCategoryWiseProducts(item.id);
       },
       borderRadius: BorderRadius.circular(14),
       child: Container(

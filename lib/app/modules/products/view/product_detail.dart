@@ -1223,7 +1223,7 @@ class _QuantityRow extends StatelessWidget {
           ),
           const SizedBox(width: 14),
           Text(
-            isOutOfStock ? '(Stock Out)' : "($maxStock)",
+            isOutOfStock ? '(Stock Out)' : "Stock ($maxStock) available",
             style: TextStyle(
               color: isOutOfStock
                   ? const Color(0xFFE11D48)

@@ -1,5 +1,6 @@
 // lib/app/modules/products/view/product_filter_page.dart
 
+import 'package:ecom_user_flutter/app/models/ecom/product/brand_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_child_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_model.dart';
 import 'package:ecom_user_flutter/app/modules/products/controller/product_controller.dart';
@@ -70,10 +71,10 @@ class ProductFilterPage extends GetView<ProductController> {
                           (controller.isFilterMoreLoading.value ? 1 : 0),
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
+                        crossAxisCount: 2,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
-                        childAspectRatio: 0.58,
+                        childAspectRatio: 0.8,
                       ),
                       itemBuilder: (context, index) {
                         if (index >= controller.filterProducts.length) {
@@ -314,17 +315,42 @@ class _FilterArea extends StatelessWidget {
               ),
             );
           }),
+          Obx(() {
+            final brands = controller.brands;
+
+            return Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: _DropBox<BrandItem>(
+                hint: controller.isBrandListLoading.value
+                    ? 'Loading...'
+                    : 'Brand',
+                value: controller.selectedBrand.value == null
+                    ? null
+                    : brands.firstWhereOrNull(
+                      (item) => item.id == controller.selectedBrand.value,
+                    ),
+                items: brands,
+                labelOf: (item) => (item.name ?? 'Brand').trim(),
+                enabled: !controller.isBrandListLoading.value,
+                onChanged: (item) {
+                  controller.setFilterBrand(item?.id);
+                },
+              ),
+            );
+          }),
           const SizedBox(height: 10),
           Obx(() {
             final hasCategory = controller.selectedCategory.value != null;
             final hasSubCategory = controller.selectedSubCategory.value != null;
             final hasChildCategory =
                 controller.selectedChildCategory.value != null;
+            final hasBrand = controller.selectedBrand.value != null;
             final hasSearch = controller.search.value.trim().isNotEmpty;
 
             if (!hasCategory &&
                 !hasSubCategory &&
                 !hasChildCategory &&
+                !hasBrand &&
                 !hasSearch) {
               return const SizedBox.shrink();
             }
@@ -350,6 +376,11 @@ class _FilterArea extends StatelessWidget {
                         _FilterChipButton(
                           label: 'Child category selected',
                           onDeleted: controller.clearFilterChildCategory,
+                        ),
+                      if (hasBrand)
+                        _FilterChipButton(
+                          label: 'Brand selected',
+                          onDeleted: controller.clearFilterBrand,
                         ),
                       if (hasSearch)
                         _FilterChipButton(
@@ -615,7 +646,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Try changing search, category, sub-category, or child category filter.',
+              'Try changing search, category, sub-category, child category, or brand filter.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w600,

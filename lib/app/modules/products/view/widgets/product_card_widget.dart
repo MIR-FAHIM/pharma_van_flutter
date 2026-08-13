@@ -189,7 +189,7 @@ class ProductCard extends GetWidget<ProductController> {
                           style: TextStyle(
                             color: AppColors.primaryColor,
                             fontWeight: FontWeight.w900,
-                            fontSize: 10.5,
+                            fontSize: 12,
                             height: 1.12,
                           ),
                         ),

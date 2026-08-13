@@ -97,10 +97,10 @@ class TodayDealProducts extends GetView<ProductController> {
                             ),
                             gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
+                              crossAxisCount: 2,
                               mainAxisSpacing: 8,
                               crossAxisSpacing: 8,
-                              childAspectRatio: 0.58,
+                              childAspectRatio: 0.8,
                             ),
                           ),
                         ),

@@ -369,7 +369,7 @@ class BrandProducts extends GetView<ProductController> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final crossAxisCount =
-            constraints.maxWidth >= 700 ? 4 : 3;
+            constraints.maxWidth >= 700 ? 3 : 2;
 
             return GridView.builder(
               padding: const EdgeInsets.fromLTRB(
@@ -388,7 +388,7 @@ class BrandProducts extends GetView<ProductController> {
                 crossAxisCount: crossAxisCount,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                childAspectRatio: 0.58,
+                childAspectRatio: 0.8,
               ),
               itemBuilder: (context, index) {
                 if (index >=

@@ -108,14 +108,7 @@ getBrands() async {
 
     final response = await manager.getWithHeaderAndParam(
       ApiClient.featuredProduct,
-      params: {
-        'page': page,
-        'per_page': perPage,
-        if (shopId != null) 'shop_id': shopId,
-        if (categoryId != null) 'category_id': categoryId,
-        if (isActive != null) 'is_active': isActive,
-        if (search != null) 'search': search,
-      },
+      params: params,
     );
 
     // print('getFilterProducts: $response');
@@ -155,14 +148,7 @@ getBrands() async {
 
     final response = await manager.getWithHeaderAndParam(
       ApiClient.todayDealProducts,
-      params: {
-        'page': page,
-        'per_page': perPage,
-        if (shopId != null) 'shop_id': shopId,
-        if (categoryId != null) 'category_id': categoryId,
-        if (isActive != null) 'is_active': isActive,
-        if (search != null) 'search': search,
-      },
+      params: params,
     );
 
     // print('getFilterProducts: $response');
@@ -201,14 +187,7 @@ getBrands() async {
 
     final response = await manager.getWithHeaderAndParam(
       ApiClient.listProducts,
-      params: {
-        'page': page,
-        'per_page': perPage,
-        if (shopId != null) 'shop_id': shopId,
-        if (categoryId != null) 'category_id': categoryId,
-        if (isActive != null) 'is_active': isActive,
-        if (search != null) 'search': search,
-      },
+      params: params,
     );
 
     // print('getFilterProducts: $response');

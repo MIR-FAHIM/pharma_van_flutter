@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ecom_user_flutter/app/models/ecom/product/brand_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_child_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/product_detail.dart';
@@ -73,6 +74,7 @@ class ProductController extends GetxController {
   // ---------------------------------------------------------------------------
 
   final categories = <CategoryItem>[].obs;
+  final brands = <BrandItem>[].obs;
   final shops = <dynamic>[].obs;
 
   final selectedCategory = RxnInt();
@@ -85,6 +87,7 @@ class ProductController extends GetxController {
 
   final isCategoryChildLoading = false.obs;
   final isSubCategoryChildLoading = false.obs;
+  final isBrandListLoading = false.obs;
 
   final selectedFilter = Rx<ProductFilterOption?>(null);
   final onlyFeatured = true.obs;
@@ -226,6 +229,7 @@ class ProductController extends GetxController {
     super.onInit();
 
     getCategories();
+    getBrands();
 
     getFeaturedProducts(reset: true);
     getTodayDealProducts(reset: true);
@@ -386,6 +390,28 @@ class ProductController extends GetxController {
     }
   }
 
+  Future<void> getBrands() async {
+    isBrandListLoading.value = true;
+
+    try {
+      final res = await _repo.getBrands();
+
+      if (res is Map && res['status'] == 'success') {
+        final model = BrandResModel.fromJson(
+          Map<String, dynamic>.from(res),
+        );
+
+        brands.assignAll(model.data?.items ?? <BrandItem>[]);
+      } else {
+        brands.clear();
+      }
+    } catch (_) {
+      brands.clear();
+    } finally {
+      isBrandListLoading.value = false;
+    }
+  }
+
   Future<void> getSubCategoryChilds(int subCategoryId) async {
     final requestToken = ++_subCategoryChildRequestToken;
 
@@ -425,6 +451,11 @@ class ProductController extends GetxController {
     if (isFilterPageLoaded.value && !forceRefresh) return;
 
     isFilterPageLoaded.value = true;
+
+    if (brands.isEmpty && !isBrandListLoading.value) {
+      getBrands();
+    }
+
     getFilterProducts(reset: true);
   }
 
@@ -496,11 +527,22 @@ class ProductController extends GetxController {
     getFilterProducts(reset: true);
   }
 
+  void setFilterBrand(int? id) {
+    selectedBrand.value = id;
+    getFilterProducts(reset: true);
+  }
+
+  void clearFilterBrand() {
+    selectedBrand.value = null;
+    getFilterProducts(reset: true);
+  }
+
   void clearFilterFilters() {
     selectedCategory.value = null;
     selectedSubCategory.value = null;
     selectedChildCategory.value = null;
     selectedShop.value = null;
+    selectedBrand.value = null;
     selectedFilter.value = null;
 
     categoryChilds.clear();
@@ -547,6 +589,7 @@ class ProductController extends GetxController {
         perPage: 20,
         shopId: null,
         categoryId: _effectiveCategoryId,
+        brandId: selectedBrand.value,
         isActive: selectedFilter.value?.isActive,
         search: _searchParam,
       );
@@ -598,6 +641,10 @@ class ProductController extends GetxController {
 
     isCategoryPageLoaded.value = true;
 
+    if (brands.isEmpty && !isBrandListLoading.value) {
+      getBrands();
+    }
+
     if (selectedCategory.value != null && categoryChilds.isEmpty) {
       getCategoryChilds(selectedCategory.value!);
     }
@@ -614,6 +661,7 @@ class ProductController extends GetxController {
     selectedSubCategory.value = null;
     selectedChildCategory.value = null;
     selectedShop.value = null;
+    selectedBrand.value = null;
 
     categoryId.value = id;
     categoryChilds.clear();
@@ -679,6 +727,16 @@ class ProductController extends GetxController {
     getCategoryWiseProduct(reset: true);
   }
 
+  void setCategoryWiseBrand(int? id) {
+    selectedBrand.value = id;
+    getCategoryWiseProduct(reset: true);
+  }
+
+  void clearCategoryWiseBrand() {
+    selectedBrand.value = null;
+    getCategoryWiseProduct(reset: true);
+  }
+
   void clearCategoryWiseSubCategory() {
     selectedSubCategory.value = null;
     selectedChildCategory.value = null;
@@ -735,6 +793,7 @@ class ProductController extends GetxController {
         perPage: 20,
         shopId: null,
         categoryId: _effectiveCategoryId,
+        brandId: selectedBrand.value,
         isActive: selectedFilter.value?.isActive,
         search: _searchParam,
       );

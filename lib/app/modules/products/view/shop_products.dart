@@ -181,10 +181,10 @@ class ShopProducts extends GetView<ProductController> {
                       itemCount: controller.shopProducts.length +
                           (controller.isShopMoreLoading.value ? 1 : 0),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
+                        crossAxisCount: 2,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
-                        childAspectRatio: 0.58,
+                        childAspectRatio: 0.8,
                       ),
                       itemBuilder: (context, index) {
                         if (index >= controller.shopProducts.length) {

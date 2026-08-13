@@ -51,10 +51,10 @@ class HomeAllProductsSection extends GetView<ProductController> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: visibleProducts.length + 1,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                  crossAxisCount: 2,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
-                  childAspectRatio: 0.58,
+                  childAspectRatio: 0.8,
                 ),
                 itemBuilder: (context, index) {
                   if (index == visibleProducts.length) {

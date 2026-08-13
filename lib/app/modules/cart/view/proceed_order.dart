@@ -680,7 +680,7 @@ class _QtyChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        'Qty $qty',
+        'Box $qty',
         style: const TextStyle(
           color: _navy,
           fontWeight: FontWeight.w900,

@@ -2,6 +2,7 @@
 
 import 'package:ecom_user_flutter/app/models/ecom/product/category_child_model.dart';
 import 'package:ecom_user_flutter/app/models/ecom/product/category_model.dart';
+import 'package:ecom_user_flutter/app/models/ecom/product/brand_model.dart';
 import 'package:ecom_user_flutter/app/modules/products/controller/product_controller.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/widgets/product_card_widget.dart';
 import 'package:ecom_user_flutter/common/Color.dart';
@@ -73,10 +74,10 @@ class CategoryWisedProducts extends GetView<ProductController> {
                           (controller.isCategoryMoreLoading.value ? 1 : 0),
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
+                        crossAxisCount: 2,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
-                        childAspectRatio: 0.58,
+                        childAspectRatio: 0.8,
                       ),
                       itemBuilder: (context, index) {
                         if (index >= controller.categoryWisedProducts.length) {
@@ -320,6 +321,30 @@ class _FilterArea extends StatelessWidget {
             );
           }),
 
+          Obx(() {
+            final brands = controller.brands;
+
+            return Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: _DropBox<BrandItem>(
+                hint: controller.isBrandListLoading.value
+                    ? 'Loading...'
+                    : 'Brand',
+                value: controller.selectedBrand.value == null
+                    ? null
+                    : brands.firstWhereOrNull(
+                      (item) => item.id == controller.selectedBrand.value,
+                    ),
+                items: brands,
+                labelOf: (item) => (item.name ?? 'Brand').trim(),
+                enabled: !controller.isBrandListLoading.value,
+                onChanged: (item) {
+                  controller.setCategoryWiseBrand(item?.id);
+                },
+              ),
+            );
+          }),
+
           const SizedBox(height: 8),
 
           Obx(() {
@@ -327,11 +352,13 @@ class _FilterArea extends StatelessWidget {
             final hasSubCategory = controller.selectedSubCategory.value != null;
             final hasChildCategory =
                 controller.selectedChildCategory.value != null;
+            final hasBrand = controller.selectedBrand.value != null;
             final hasSearch = controller.search.value.trim().isNotEmpty;
 
             if (!hasCategory &&
                 !hasSubCategory &&
                 !hasChildCategory &&
+                !hasBrand &&
                 !hasSearch) {
               return const SizedBox.shrink();
             }
@@ -358,6 +385,11 @@ class _FilterArea extends StatelessWidget {
                           label: 'Child category selected',
                           onDeleted: controller.clearCategoryWiseChildCategory,
                         ),
+                      if (hasBrand)
+                        _FilterChipButton(
+                          label: 'Brand selected',
+                          onDeleted: controller.clearCategoryWiseBrand,
+                        ),
                       if (hasSearch)
                         _FilterChipButton(
                           label: controller.search.value,
@@ -375,6 +407,7 @@ class _FilterArea extends StatelessWidget {
                     controller.selectedSubCategory.value = null;
                     controller.selectedChildCategory.value = null;
                     controller.selectedShop.value = null;
+                    controller.selectedBrand.value = null;
                     controller.categoryId.value = null;
                     controller.categoryChilds.clear();
                     controller.subCategoryChilds.clear();
@@ -632,7 +665,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Try changing category, sub-category, child category, or search.',
+              'Try changing category, sub-category, child category, brand, or search.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w600,

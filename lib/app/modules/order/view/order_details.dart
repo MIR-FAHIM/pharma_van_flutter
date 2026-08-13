@@ -565,7 +565,7 @@ class _ItemsCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          'Qty ${item.qty} × ${_money(item.unitPrice)}',
+                          'Box ${item.qty} × ${_money(item.unitPrice)}',
                           style: const TextStyle(
                             color: Colors.black54,
                             fontWeight: FontWeight.w700,
