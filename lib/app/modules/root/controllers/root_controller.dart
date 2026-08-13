@@ -55,7 +55,7 @@ class RootController extends GetxController {
   advancedStatusCheck() async {
     print("hle broooooo");
     final newVersion = NewVersionPlus(
-      androidId: 'com.pharmavan.customer',
+      androidId: 'com.pharmavan.customernew',
     );
     var status = await newVersion.getVersionStatus();
     print("version status ${status!.appStoreLink}");

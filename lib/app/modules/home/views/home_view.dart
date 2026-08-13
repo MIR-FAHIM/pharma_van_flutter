@@ -17,7 +17,10 @@ import 'package:ecom_user_flutter/app/modules/products/view/widgets/home_all_pro
 import 'package:ecom_user_flutter/app/modules/products/view/widgets/home_fasion_product.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/widgets/home_restaurant_products.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/widgets/medicine_home.dart';
+import 'package:ecom_user_flutter/app/modules/shop/view/home_brand_list.dart';
+import 'package:ecom_user_flutter/app/modules/shop/view/home_shop_list.dart';
 import 'package:ecom_user_flutter/app/routes/app_pages.dart';
+import 'package:ecom_user_flutter/app/services/auth_service.dart';
 import 'package:ecom_user_flutter/common/Color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -131,10 +134,10 @@ class HomeView extends GetView<HomeController> {
                 child: SizedBox(height: 12),
               ),
 
-              // Client ad / promo strip
-              const SliverToBoxAdapter(
-                child: HomePromoStrip(),
-              ),
+              // // Client ad / promo strip
+              // const SliverToBoxAdapter(
+              //   child: HomePromoStrip(),
+              // ),
 
               const SliverToBoxAdapter(
                 child: SizedBox(height: 14),
@@ -201,8 +204,6 @@ class HomeView extends GetView<HomeController> {
                 child: SizedBox(height: 14),
               ),
 
-
-
               const SliverToBoxAdapter(
                 child: SizedBox(height: 14),
               ),
@@ -212,6 +213,16 @@ class HomeView extends GetView<HomeController> {
                 child: _PdfSectionBlock(
                   backgroundColor: AppColors.backgroundColor,
                   child: HomeBabyCareSection(),
+                ),
+              ),
+
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 14),
+              ),
+              SliverToBoxAdapter(
+                child: _PdfSectionBlock(
+                  backgroundColor: AppColors.backgroundColor,
+                  child: HomeBrandListSection(),
                 ),
               ),
 
@@ -292,16 +303,32 @@ class _PdfStyleHomeHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      "Mr XYZ",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
+                    Get.find<AuthService>().currentUser.value.data == null
+                        ? Text(
+                            "Mr XYZ",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.textWhite,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          )
+                        : Text(
+                            Get.find<AuthService>()
+                                .currentUser
+                                .value
+                                .data!
+                                .user!
+                                .name!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppColors.textWhite,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          )
                   ],
                 ),
               ),

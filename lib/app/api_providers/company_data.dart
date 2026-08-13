@@ -9,7 +9,7 @@ class CompanyData {
   // static const String siteName = "EcomUser";
   // static const String companyID = "1";
   // static const String companyLogo = "assets/logo/papplus.png";
-  // static const String packageName = "com.pharmavan.customer";
+  // static const String packageName = "com.pharmavan.customernew";
 
   // myzoo
   //
@@ -20,7 +20,7 @@ class CompanyData {
   static const String version = "1.0.1+1";
   static const String companyID = "2";
   static const String companyLogo = "assets/logo/pharmavan_logo.png";
-  static const String packageName = "com.pharmavan.customer";
+  static const String packageName = "com.pharmavan.customernew";
 
 
   //Braintodo
@@ -30,6 +30,6 @@ class CompanyData {
  //  static const String siteName = "BrainToDo";
  //  static const String companyID = "3";
  //  static const String companyLogo = "assets/logo/braintodo.png";
- //  static const String packageName = "com.pharmavan.customer";
+ //  static const String packageName = "com.pharmavan.customernew";
 
 }

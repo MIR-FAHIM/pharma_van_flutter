@@ -168,4 +168,20 @@ class AppColors {
 
   static const Color softPink = Color(0xFFFDECEC);
   static const Color softBrwn = Color(0xFF6B4F3A);
+
+  static final todayDealColor = HexColor("#DF7529");
+}
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll("#", "");
+
+    if (hexColor.length == 6) {
+      hexColor = "FF$hexColor";
+    }
+
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }

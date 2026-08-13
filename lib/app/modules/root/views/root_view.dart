@@ -1,10 +1,7 @@
 import 'package:ecom_user_flutter/app/modules/cart/controller/cart_controller.dart';
 import 'package:ecom_user_flutter/app/modules/delivery/controller/delivery_controller.dart';
-import 'package:ecom_user_flutter/common/Color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'package:ecom_user_flutter/app/modules/global_widgets/main_drawer_widget.dart';
 import 'package:ecom_user_flutter/app/modules/home/controllers/home_controller.dart';
 import '../controllers/root_controller.dart';
 

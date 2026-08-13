@@ -20,6 +20,7 @@ import 'package:ecom_user_flutter/app/modules/delivery/view/pending_delivery_vie
 import 'package:ecom_user_flutter/app/modules/order/binding/order_binding.dart';
 import 'package:ecom_user_flutter/app/modules/order/view/order_details.dart';
 import 'package:ecom_user_flutter/app/modules/products/binding/product_binding.dart';
+import 'package:ecom_user_flutter/app/modules/products/view/brand_products.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/category_wised_products.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/product_detail.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/search_product_view.dart';
@@ -129,6 +130,11 @@ GetPage(
     GetPage(
       name: _Paths.SHOP_PRODUCT,
       page: () => ShopProducts(),
+      binding: ProductBinding(),
+    ),
+    GetPage(
+      name: _Paths.BRAND_PRODUCT,
+      page: () => BrandProducts(),
       binding: ProductBinding(),
     ),
 GetPage(

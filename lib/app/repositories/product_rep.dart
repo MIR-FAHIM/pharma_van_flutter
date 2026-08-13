@@ -45,8 +45,14 @@ class ProductRepository {
     return response;
   }
 getBrands() async {
+
+    print("get brand called");
+  Map<String, String> header = {
+    'Authorization' : "Bearer ${Get.find<AuthService>().currentUser.value.data!.token}",
+  };
+
     APIManager _manager = APIManager();
-    final response = await _manager.getWithHeader(ApiClient.listBrands, {});
+    final response = await _manager.getWithHeader(ApiClient.listBrands, header);
 
     print('getBrands 3453: ${response}');
 

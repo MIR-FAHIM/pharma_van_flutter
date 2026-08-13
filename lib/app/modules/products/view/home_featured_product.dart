@@ -32,7 +32,7 @@ class HomeFeaturedProductsSection extends GetView<ProductController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SectionHeader(
-              title: "Featured Product",
+              title: "Special Offer",
               onSeeAllTap: () {
                 Get.toNamed(Routes.PRODUCT_FILTER);
               },

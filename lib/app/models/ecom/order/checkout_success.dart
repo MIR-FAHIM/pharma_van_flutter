@@ -1,50 +1,19 @@
 class CheckoutSuccessResponse {
   final String? status;
   final String? message;
-  final List<CheckoutSuccessOrder>? data;
+  final CheckoutSuccessData? checkoutData;
 
   CheckoutSuccessResponse({
-     this.status,
-     this.message,
-     this.data,
+    this.status,
+    this.message,
+    this.checkoutData,
   });
-
-  bool get isSuccess => status!.toLowerCase() == 'success';
-
-  int get totalOrders => data!.length;
-
-  num get grandTotal {
-    return data!.fold<num>(0, (sum, order) => sum + order.total);
-  }
-
-  num get grandSubtotal {
-    return data!.fold<num>(0, (sum, order) => sum + order.subtotal);
-  }
-
-  num get grandShippingFee {
-    return data!.fold<num>(0, (sum, order) => sum + order.shippingFee);
-  }
-
-  num get grandDiscount {
-    return data!.fold<num>(0, (sum, order) => sum + order.discount);
-  }
-
-  String get firstOrderNumber {
-    if (data!.isEmpty) return '';
-    return data!.first.orderNumber;
-  }
 
   factory CheckoutSuccessResponse.fromJson(Map<String, dynamic> json) {
     return CheckoutSuccessResponse(
-      status: json['status']?.toString() ?? '',
-      message: json['message']?.toString() ?? '',
-      data: json['data'] is List
-          ? (json['data'] as List)
-          .map((e) => CheckoutSuccessOrder.fromJson(
-        Map<String, dynamic>.from(e),
-      ))
-          .toList()
-          : <CheckoutSuccessOrder>[],
+      status: json['status']?.toString(),
+      message: json['message']?.toString(),
+      checkoutData: _parseCheckoutData(json['data']),
     );
   }
 
@@ -52,146 +21,442 @@ class CheckoutSuccessResponse {
     return {
       'status': status,
       'message': message,
-      'data': data!.map((e) => e.toJson()).toList(),
+      'data': checkoutData?.toJson(),
     };
+  }
+
+  bool get isSuccess {
+    return status?.toLowerCase().trim() == 'success';
+  }
+
+  /*
+    Compatibility getter for your current CheckoutSuccessView.
+
+    Your UI uses:
+    checkout.data!.isEmpty
+    checkout.data!.first
+    checkout.data![index]
+  */
+  List<CheckoutSuccessOrder>? get data {
+    return checkoutData?.orders ?? [];
+  }
+
+  String get paymentGroupId {
+    return checkoutData?.paymentGroupId ?? '';
+  }
+
+  List<int> get orderIds {
+    return checkoutData?.orderIds ?? [];
+  }
+
+  int get totalOrders {
+    return checkoutData?.totalOrders ?? data?.length ?? 0;
+  }
+
+  double get grandSubtotal {
+    if (checkoutData?.subtotal != null) {
+      return checkoutData!.subtotal!;
+    }
+
+    return data?.fold<double>(
+      0,
+          (sum, order) => sum + (order.subtotal),
+    ) ??
+        0;
+  }
+
+  double get grandShippingFee {
+    if (checkoutData?.shippingFee != null) {
+      return checkoutData!.shippingFee!;
+    }
+
+    return data?.fold<double>(
+      0,
+          (sum, order) => sum + (order.shippingFee),
+    ) ??
+        0;
+  }
+
+  double get grandDiscount {
+    return data?.fold<double>(
+      0,
+          (sum, order) => sum + (order.discount),
+    ) ??
+        0;
+  }
+
+  double get grandTotal {
+    if (checkoutData?.totalPayable != null) {
+      return checkoutData!.totalPayable!;
+    }
+
+    return data?.fold<double>(
+      0,
+          (sum, order) => sum + (order.total),
+    ) ??
+        0;
+  }
+
+  CheckoutSms? get sms {
+    return checkoutData?.sms;
+  }
+
+  static CheckoutSuccessData? _parseCheckoutData(dynamic rawData) {
+    if (rawData == null) return null;
+
+    if (rawData is Map<String, dynamic>) {
+      return CheckoutSuccessData.fromJson(rawData);
+    }
+
+    if (rawData is Map) {
+      return CheckoutSuccessData.fromJson(
+        Map<String, dynamic>.from(rawData),
+      );
+    }
+
+    /*
+      Fallback for old response format where data was directly a list.
+    */
+    if (rawData is List) {
+      return CheckoutSuccessData(
+        orders: rawData
+            .whereType<Map>()
+            .map(
+              (item) => CheckoutSuccessOrder.fromJson(
+            Map<String, dynamic>.from(item),
+          ),
+        )
+            .toList(),
+      );
+    }
+
+    return null;
   }
 }
 
-class CheckoutSuccessOrder {
-  final int id;
-  final String userId;
-  final String orderNumber;
-  final String status;
-  final String paymentStatus;
-  final String customerName;
-  final String customerPhone;
-  final String shippingAddress;
-  final String zone;
-  final String? district;
-  final String? area;
-  final String? lat;
-  final String? lon;
-  final num subtotal;
-  final num shippingFee;
-  final num discount;
-  final num total;
-  final String note;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final List<CheckoutSuccessItem> items;
+class CheckoutSuccessData {
+  final String? paymentGroupId;
+  final List<int> orderIds;
+  final int? totalOrders;
 
-  CheckoutSuccessOrder({
-    required this.id,
-    required this.userId,
-    required this.orderNumber,
-    required this.status,
-    required this.paymentStatus,
-    required this.customerName,
-    required this.customerPhone,
-    required this.shippingAddress,
-    required this.zone,
-    required this.district,
-    required this.area,
-    required this.lat,
-    required this.lon,
-    required this.subtotal,
-    required this.shippingFee,
-    required this.discount,
-    required this.total,
-    required this.note,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.items,
+  final double? subtotal;
+  final double? shippingFee;
+  final double? totalPayable;
+
+  final CheckoutSms? sms;
+  final List<CheckoutSuccessOrder> orders;
+
+  CheckoutSuccessData({
+    this.paymentGroupId,
+    this.orderIds = const [],
+    this.totalOrders,
+    this.subtotal,
+    this.shippingFee,
+    this.totalPayable,
+    this.sms,
+    this.orders = const [],
   });
 
-  factory CheckoutSuccessOrder.fromJson(Map<String, dynamic> json) {
-    return CheckoutSuccessOrder(
-      id: _toInt(json['id']),
-      userId: json['user_id']?.toString() ?? '',
-      orderNumber: json['order_number']?.toString() ?? '',
-      status: json['status']?.toString() ?? '',
-      paymentStatus: json['payment_status']?.toString() ?? '',
-      customerName: json['customer_name']?.toString() ?? '',
-      customerPhone: json['customer_phone']?.toString() ?? '',
-      shippingAddress: json['shipping_address']?.toString() ?? '',
-      zone: json['zone']?.toString() ?? '',
-      district: json['district']?.toString(),
-      area: json['area']?.toString(),
-      lat: json['lat']?.toString(),
-      lon: json['lon']?.toString(),
-      subtotal: _toNum(json['subtotal']),
-      shippingFee: _toNum(json['shipping_fee']),
-      discount: _toNum(json['discount']),
-      total: _toNum(json['total']),
-      note: json['note']?.toString() ?? '',
-      createdAt: _toDate(json['created_at']),
-      updatedAt: _toDate(json['updated_at']),
-      items: json['items'] is List
-          ? (json['items'] as List)
-          .map((e) => CheckoutSuccessItem.fromJson(
-        Map<String, dynamic>.from(e),
-      ))
+  factory CheckoutSuccessData.fromJson(Map<String, dynamic> json) {
+    return CheckoutSuccessData(
+      paymentGroupId: json['payment_group_id']?.toString(),
+      orderIds: json['order_ids'] is List
+          ? (json['order_ids'] as List)
+          .map((item) => _toInt(item))
+          .whereType<int>()
           .toList()
-          : <CheckoutSuccessItem>[],
+          : [],
+      totalOrders: _toInt(json['total_orders']),
+      subtotal: _toDouble(json['subtotal']),
+      shippingFee: _toDouble(json['shipping_fee']),
+      totalPayable: _toDouble(json['total_payable']),
+      sms: json['sms'] is Map
+          ? CheckoutSms.fromJson(
+        Map<String, dynamic>.from(json['sms']),
+      )
+          : null,
+      orders: json['orders'] is List
+          ? (json['orders'] as List)
+          .whereType<Map>()
+          .map(
+            (item) => CheckoutSuccessOrder.fromJson(
+          Map<String, dynamic>.from(item),
+        ),
+      )
+          .toList()
+          : [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'user_id': userId,
-      'order_number': orderNumber,
-      'status': status,
-      'payment_status': paymentStatus,
-      'customer_name': customerName,
-      'customer_phone': customerPhone,
-      'shipping_address': shippingAddress,
-      'zone': zone,
-      'district': district,
-      'area': area,
-      'lat': lat,
-      'lon': lon,
+      'payment_group_id': paymentGroupId,
+      'order_ids': orderIds,
+      'total_orders': totalOrders,
       'subtotal': subtotal,
       'shipping_fee': shippingFee,
-      'discount': discount,
-      'total': total,
-      'note': note,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
-      'items': items.map((e) => e.toJson()).toList(),
+      'total_payable': totalPayable,
+      'sms': sms?.toJson(),
+      'orders': orders.map((item) => item.toJson()).toList(),
     };
   }
 }
 
+class CheckoutSms {
+  final String? status;
+  final String? message;
+  final String? receiver;
+
+  CheckoutSms({
+    this.status,
+    this.message,
+    this.receiver,
+  });
+
+  factory CheckoutSms.fromJson(Map<String, dynamic> json) {
+    return CheckoutSms(
+      status: json['status']?.toString(),
+      message: json['message']?.toString(),
+      receiver: json['receiver']?.toString(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'message': message,
+      'receiver': receiver,
+    };
+  }
+
+  bool get isSuccess {
+    return status?.toLowerCase().trim() == 'success';
+  }
+}
+
+class CheckoutSuccessOrder {
+  final int? userId;
+  final String? orderNumber;
+  final String? paymentGroupId;
+  final String? statusValue;
+  final String? paymentStatusValue;
+
+  final String? customerNameValue;
+  final String? customerPhoneValue;
+  final String? shippingAddressValue;
+
+  final String? zoneValue;
+  final String? district;
+  final int? userAddressId;
+  final String? area;
+  final double? lat;
+  final double? lon;
+
+  final double? subtotalValue;
+  final double? shippingFeeValue;
+  final double? discountValue;
+  final double? totalValue;
+
+  final String? noteValue;
+  final String? platform;
+
+  final DateTime? updatedAt;
+  final DateTime? createdAt;
+  final int? id;
+
+  final List<CheckoutSuccessItem> items;
+
+  CheckoutSuccessOrder({
+    this.userId,
+    this.orderNumber,
+    this.paymentGroupId,
+    this.statusValue,
+    this.paymentStatusValue,
+    this.customerNameValue,
+    this.customerPhoneValue,
+    this.shippingAddressValue,
+    this.zoneValue,
+    this.district,
+    this.userAddressId,
+    this.area,
+    this.lat,
+    this.lon,
+    this.subtotalValue,
+    this.shippingFeeValue,
+    this.discountValue,
+    this.totalValue,
+    this.noteValue,
+    this.platform,
+    this.updatedAt,
+    this.createdAt,
+    this.id,
+    this.items = const [],
+  });
+
+  factory CheckoutSuccessOrder.fromJson(Map<String, dynamic> json) {
+    return CheckoutSuccessOrder(
+      userId: _toInt(json['user_id']),
+      orderNumber: json['order_number']?.toString(),
+      paymentGroupId: json['payment_group_id']?.toString(),
+      statusValue: json['status']?.toString(),
+      paymentStatusValue: json['payment_status']?.toString(),
+      customerNameValue: json['customer_name']?.toString(),
+      customerPhoneValue: json['customer_phone']?.toString(),
+      shippingAddressValue: json['shipping_address']?.toString(),
+      zoneValue: json['zone']?.toString(),
+      district: json['district']?.toString(),
+      userAddressId: _toInt(json['user_address_id']),
+      area: json['area']?.toString(),
+      lat: _toDouble(json['lat']),
+      lon: _toDouble(json['lon']),
+      subtotalValue: _toDouble(json['subtotal']),
+      shippingFeeValue: _toDouble(json['shipping_fee']),
+      discountValue: _toDouble(json['discount']),
+      totalValue: _toDouble(json['total']),
+      noteValue: json['note']?.toString(),
+      platform: json['platform']?.toString(),
+      updatedAt: _toDateTime(json['updated_at']),
+      createdAt: _toDateTime(json['created_at']),
+      id: _toInt(json['id']),
+      items: json['items'] is List
+          ? (json['items'] as List)
+          .whereType<Map>()
+          .map(
+            (item) => CheckoutSuccessItem.fromJson(
+          Map<String, dynamic>.from(item),
+        ),
+      )
+          .toList()
+          : [],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user_id': userId,
+      'order_number': orderNumber,
+      'payment_group_id': paymentGroupId,
+      'status': statusValue,
+      'payment_status': paymentStatusValue,
+      'customer_name': customerNameValue,
+      'customer_phone': customerPhoneValue,
+      'shipping_address': shippingAddressValue,
+      'zone': zoneValue,
+      'district': district,
+      'user_address_id': userAddressId,
+      'area': area,
+      'lat': lat,
+      'lon': lon,
+      'subtotal': subtotalValue,
+      'shipping_fee': shippingFeeValue,
+      'discount': discountValue,
+      'total': totalValue,
+      'note': noteValue,
+      'platform': platform,
+      'updated_at': updatedAt?.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
+      'id': id,
+      'items': items.map((item) => item.toJson()).toList(),
+    };
+  }
+
+  /*
+    Safe getters for your current UI.
+    Your CheckoutSuccessView uses non-null String and num values.
+  */
+
+  String get orderNumberText {
+    return orderNumber ?? '';
+  }
+
+  String get status {
+    return statusValue ?? '';
+  }
+
+  String get paymentStatus {
+    return paymentStatusValue ?? '';
+  }
+
+  String get customerName {
+    return customerNameValue ?? '';
+  }
+
+  String get customerPhone {
+    return customerPhoneValue ?? '';
+  }
+
+  String get shippingAddress {
+    return shippingAddressValue ?? '';
+  }
+
+  String get zone {
+    final value = zoneValue ?? '';
+
+    if (value == '[object Object]') return '';
+
+    return value;
+  }
+
+  String get note {
+    return noteValue ?? '';
+  }
+
+  double get subtotal {
+    return subtotalValue ?? 0;
+  }
+
+  double get shippingFee {
+    return shippingFeeValue ?? 0;
+  }
+
+  double get discount {
+    return discountValue ?? 0;
+  }
+
+  double get total {
+    return totalValue ?? 0;
+  }
+
+  /*
+    This getter keeps your existing UI working because your page uses:
+    order.orderNumber
+  */
+  String get orderNumberSafe {
+    return orderNumber ?? '';
+  }
+}
+
 class CheckoutSuccessItem {
-  final int id;
-  final int orderId;
-  final int productId;
-  final int shopId;
-  final String productName;
+  final int? id;
+  final int? orderId;
+  final int? productId;
+  final int? shopId;
+
+  final String? productNameValue;
   final String? sku;
-  final num unitPrice;
-  final int qty;
-  final num lineTotal;
-  final String status;
-  final int isSettleWithSeller;
+
+  final double? unitPriceValue;
+  final int? qtyValue;
+  final double? lineTotalValue;
+
+  final String? statusValue;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   CheckoutSuccessItem({
-    required this.id,
-    required this.orderId,
-    required this.productId,
-    required this.shopId,
-    required this.productName,
-    required this.sku,
-    required this.unitPrice,
-    required this.qty,
-    required this.lineTotal,
-    required this.status,
-    required this.isSettleWithSeller,
-    required this.createdAt,
-    required this.updatedAt,
+    this.id,
+    this.orderId,
+    this.productId,
+    this.shopId,
+    this.productNameValue,
+    this.sku,
+    this.unitPriceValue,
+    this.qtyValue,
+    this.lineTotalValue,
+    this.statusValue,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory CheckoutSuccessItem.fromJson(Map<String, dynamic> json) {
@@ -200,15 +465,14 @@ class CheckoutSuccessItem {
       orderId: _toInt(json['order_id']),
       productId: _toInt(json['product_id']),
       shopId: _toInt(json['shop_id']),
-      productName: json['product_name']?.toString() ?? '',
+      productNameValue: json['product_name']?.toString(),
       sku: json['sku']?.toString(),
-      unitPrice: _toNum(json['unit_price']),
-      qty: _toInt(json['qty']),
-      lineTotal: _toNum(json['line_total']),
-      status: json['status']?.toString() ?? '',
-      isSettleWithSeller: _toInt(json['is_settle_with_seller']),
-      createdAt: _toDate(json['created_at']),
-      updatedAt: _toDate(json['updated_at']),
+      unitPriceValue: _toDouble(json['unit_price']),
+      qtyValue: _toInt(json['qty']),
+      lineTotalValue: _toDouble(json['line_total']),
+      statusValue: json['status']?.toString(),
+      createdAt: _toDateTime(json['created_at']),
+      updatedAt: _toDateTime(json['updated_at']),
     );
   }
 
@@ -218,32 +482,62 @@ class CheckoutSuccessItem {
       'order_id': orderId,
       'product_id': productId,
       'shop_id': shopId,
-      'product_name': productName,
+      'product_name': productNameValue,
       'sku': sku,
-      'unit_price': unitPrice,
-      'qty': qty,
-      'line_total': lineTotal,
-      'status': status,
-      'is_settle_with_seller': isSettleWithSeller,
+      'unit_price': unitPriceValue,
+      'qty': qtyValue,
+      'line_total': lineTotalValue,
+      'status': statusValue,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
   }
+
+  String get productName {
+    return productNameValue ?? '';
+  }
+
+  double get unitPrice {
+    return unitPriceValue ?? 0;
+  }
+
+  int get qty {
+    return qtyValue ?? 0;
+  }
+
+  double get lineTotal {
+    return lineTotalValue ?? 0;
+  }
+
+  String get status {
+    return statusValue ?? '';
+  }
 }
 
-num _toNum(dynamic value) {
-  if (value == null) return 0;
-  if (value is num) return value;
-  return num.tryParse(value.toString()) ?? 0;
-}
-
-int _toInt(dynamic value) {
-  if (value == null) return 0;
-  if (value is int) return value;
-  return int.tryParse(value.toString()) ?? 0;
-}
-
-DateTime? _toDate(dynamic value) {
+int? _toInt(dynamic value) {
   if (value == null) return null;
-  return DateTime.tryParse(value.toString());
+  if (value is int) return value;
+  if (value is double) return value.toInt();
+  if (value is num) return value.toInt();
+
+  return int.tryParse(value.toString());
+}
+
+double? _toDouble(dynamic value) {
+  if (value == null) return null;
+  if (value is double) return value;
+  if (value is int) return value.toDouble();
+  if (value is num) return value.toDouble();
+
+  return double.tryParse(value.toString());
+}
+
+DateTime? _toDateTime(dynamic value) {
+  if (value == null) return null;
+
+  final String text = value.toString().trim();
+
+  if (text.isEmpty) return null;
+
+  return DateTime.tryParse(text);
 }

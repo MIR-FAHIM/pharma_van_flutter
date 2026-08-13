@@ -35,10 +35,10 @@ class ShopListView extends GetView<ShopController> {
         }
 
         if (controller.error.value.isNotEmpty) {
-          return _ErrorState(
-            message: controller.error.value,
-            onRetry: controller.getShops,
-          );
+          // return _ErrorState(
+          //   message: controller.error.value,
+          //   onRetry: controller.getShops,
+          // );
         }
 
         final shops = controller.shopList;
@@ -71,7 +71,7 @@ class _ShopCard extends StatelessWidget {
     required this.item,
   });
 
-  final Datum item;
+  final DatumShop item;
 
   @override
   Widget build(BuildContext context) {

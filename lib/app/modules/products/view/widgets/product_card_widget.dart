@@ -36,16 +36,14 @@ class ProductCard extends GetWidget<ProductController> {
 
   num _discountedPrice({
     required num price,
-    required num discount,
+    required double discount,
     required String? discountType,
   }) {
     if (discount <= 0) return price;
 
     final isPercentage = _isPercentageDiscount(discountType);
 
-    final discountAmount = isPercentage
-        ? price * discount / 100
-        : discount;
+    final discountAmount = isPercentage ? price * discount / 100 : discount;
 
     final finalPrice = price - discountAmount;
 
@@ -74,7 +72,7 @@ class ProductCard extends GetWidget<ProductController> {
     );
 
     final price = product.unitPrice;
-    final discount = product.discount;
+    final discount = product.discount ?? 0;
     final hasDiscount = discount > 0;
 
     final finalPrice = _discountedPrice(
@@ -83,23 +81,24 @@ class ProductCard extends GetWidget<ProductController> {
       discountType: product.discountType,
     );
 
-    final name = product.name.trim();
+    final name = (product.name ?? '').trim();
     final unit = (product.unit ?? '').trim();
-
 
     final rating = product.rating;
     final sold = product.numOfSale;
 
-    final shopName = (product.addedBy ?? '').trim().isEmpty
+    final shopName = (product.shop?.shopName ?? product.addedBy ?? '').trim().isEmpty
         ? 'Shop Name'
-        : product.addedBy!.trim();
+        : (product.shop?.shopName ?? product.addedBy ?? '').trim();
+
+    final isOutOfStock = product.currentStock <= 0;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
         onTap: onTap ??
-                () {
+            () {
               controller.getProductDetail(product.id);
             },
         child: Container(
@@ -136,28 +135,27 @@ class ProductCard extends GetWidget<ProductController> {
                           child: imageUrl == null || imageUrl.isEmpty
                               ? const _ImagePlaceholder()
                               : Image.network(
-                            imageUrl,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) {
-                              return const _ImagePlaceholder();
-                            },
-                            loadingBuilder: (_, child, progress) {
-                              if (progress == null) return child;
+                                  imageUrl,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) {
+                                    return const _ImagePlaceholder();
+                                  },
+                                  loadingBuilder: (_, child, progress) {
+                                    if (progress == null) return child;
 
-                              return const Center(
-                                child: SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
+                                    return const Center(
+                                      child: SizedBox(
+                                        height: 22,
+                                        width: 22,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
                         ),
                       ),
-
                       if (hasDiscount)
                         Positioned(
                           top: 0,
@@ -169,6 +167,7 @@ class ProductCard extends GetWidget<ProductController> {
                             ),
                           ),
                         ),
+                      if (isOutOfStock) const _StockOutOverlay(),
                     ],
                   ),
                 ),
@@ -188,13 +187,12 @@ class ProductCard extends GetWidget<ProductController> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: AppColors.textBlack,
+                            color: AppColors.primaryColor,
                             fontWeight: FontWeight.w900,
                             fontSize: 10.5,
                             height: 1.12,
                           ),
                         ),
-
                         if (unit.isNotEmpty) ...[
                           const SizedBox(height: 1),
                           Text(
@@ -208,11 +206,8 @@ class ProductCard extends GetWidget<ProductController> {
                               height: 1.05,
                             ),
                           ),
-
                         ],
-
                         const Spacer(),
-
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -229,7 +224,6 @@ class ProductCard extends GetWidget<ProductController> {
                                 ),
                               ),
                             ),
-
                             if (hasDiscount) ...[
                               const SizedBox(width: 4),
                               Flexible(
@@ -238,8 +232,8 @@ class ProductCard extends GetWidget<ProductController> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    color:
-                                    AppColors.primaryColor.withOpacity(0.42),
+                                    color: AppColors.primaryColor
+                                        .withOpacity(0.42),
                                     fontWeight: FontWeight.w800,
                                     fontSize: 10,
                                     decoration: TextDecoration.lineThrough,
@@ -253,9 +247,7 @@ class ProductCard extends GetWidget<ProductController> {
                             ],
                           ],
                         ),
-
                         const SizedBox(height: 4),
-
                         Row(
                           children: [
                             Icon(
@@ -274,6 +266,8 @@ class ProductCard extends GetWidget<ProductController> {
                               ),
                             ),
                             const SizedBox(width: 3),
+                            Container(height: 10, width: 1, color: Colors.black,),
+                            const SizedBox(width: 3),
                             Text(
                               '$sold sold',
                               style: TextStyle(
@@ -283,11 +277,12 @@ class ProductCard extends GetWidget<ProductController> {
                                 height: 1,
                               ),
                             ),
-                            const Spacer(),
-                            Flexible(
-                              child: _ShopPill(text: shopName),
-                            ),
+
+
                           ],
+                        ),
+                        Flexible(
+                          child: _ShopPill(text: shopName),
                         ),
                       ],
                     ),
@@ -296,6 +291,47 @@ class ProductCard extends GetWidget<ProductController> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StockOutOverlay extends StatelessWidget {
+  const _StockOutOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: Container(
+        color: Colors.white.withOpacity(0.58),
+        alignment: Alignment.center,
+        child: const _StockOutChip(),
+      ),
+    );
+  }
+}
+
+class _StockOutChip extends StatelessWidget {
+  const _StockOutChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE11D48),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: const Text(
+        'Stock Out',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 9,
+          fontWeight: FontWeight.w900,
+          height: 1,
         ),
       ),
     );
@@ -366,7 +402,7 @@ class _ShopPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(
-        maxWidth: 54,
+        maxWidth: 100,
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: 5,

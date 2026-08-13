@@ -1,27 +1,29 @@
 // lib/app/modules/products/view/widgets/baby_care_home.dart
 
+import 'package:ecom_user_flutter/app/api_providers/company_data.dart';
 import 'package:ecom_user_flutter/app/modules/products/controller/product_controller.dart';
 import 'package:ecom_user_flutter/app/modules/products/view/widgets/product_card_widget.dart';
+import 'package:ecom_user_flutter/app/modules/shop/controller/shop_controller.dart';
 import 'package:ecom_user_flutter/common/Color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomeGrocerySection extends GetView<ProductController> {
-  const HomeGrocerySection({super.key});
+class HomeBrandListSection extends GetView<ShopController> {
+  const HomeBrandListSection({super.key});
 
   static const int _groceryCategoryId = 4;
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final loading = controller.isHomeSectionLoading.value;
-      final products = controller.groceryProducts;
+      final loading = controller.isLoadingBrands.value;
+      final brands = controller.brandList.value;
 
-      if (loading && products.isEmpty) {
+      if (loading && brands.isEmpty) {
         return const _BabyCareSkeleton();
       }
 
-      if (products.isEmpty) {
+      if (brands.isEmpty) {
         return const SizedBox.shrink();
       }
 
@@ -33,27 +35,122 @@ class HomeGrocerySection extends GetView<ProductController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SectionHeader(
-              title: "Grocery",
+              title: "Manufacturer",
               onSeeAllTap: () {
-                controller.openCategoryWiseProducts(_groceryCategoryId);
+                controller.getBrands(false);
               },
             ),
-
             const SizedBox(height: 8),
-
             SizedBox(
-              height: 214,
+              height: 120,
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                itemCount: products.length,
+                itemCount: brands.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (_, index) {
-                  return ProductCard(
-                    product: products[index],
-                    width: 128,
-                  );
+                  if (brands[index].logo == null) {
+                    return Column(
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.network(
+                              'https://placehold.co/400',
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) {
+                                return const Icon(
+                                  Icons.branding_watermark_outlined,
+                                  color: Colors.black38,
+                                  size: 34,
+                                );
+                              },
+                              loadingBuilder: (_, child, progress) {
+                                if (progress == null) return child;
+
+                                return const Center(
+                                  child: SizedBox(
+                                    height: 22,
+                                    width: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 8,),
+                        Text(brands[index].name!)
+                      ],
+                    );
+                  } else {
+                    var logoUrl = _asImageUrl(brands[index].logo!.fileName);
+                    return InkWell(
+                      onTap: (){
+                        Get.find<ProductController>().openBrandProducts(brands[index].id);
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(22),
+                              border: Border.all(color: Colors.grey.shade200),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: logoUrl.isEmpty
+                                  ? const Icon(
+                                Icons.branding_watermark_outlined,
+                                color: Colors.black38,
+                                size: 34,
+                              )
+                                  : Image.network(
+                                logoUrl,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) {
+                                  return const Icon(
+                                    Icons.branding_watermark_outlined,
+                                    color: Colors.black38,
+                                    size: 34,
+                                  );
+                                },
+                                loadingBuilder: (_, child, progress) {
+                                  if (progress == null) return child;
+
+                                  return const Center(
+                                    child: SizedBox(
+                                      height: 22,
+                                      width: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 8,),
+                          Text(brands[index].name!)
+                        ],
+                      ),
+                    );
+                  }
                 },
               ),
             ),
@@ -62,6 +159,22 @@ class HomeGrocerySection extends GetView<ProductController> {
       );
     });
   }
+}
+
+String _asImageUrl(String? fileName) {
+  if (fileName == null || fileName.trim().isEmpty) return '';
+  if (fileName.startsWith('http')) return fileName;
+
+  final base = CompanyData.image_file_url.endsWith('/')
+      ? CompanyData.image_file_url.substring(
+    0,
+    CompanyData.image_file_url.length - 1,
+  )
+      : CompanyData.image_file_url;
+
+  final file = fileName.startsWith('/') ? fileName : '/$fileName';
+
+  return '$base$file';
 }
 
 class _SectionHeader extends StatelessWidget {
@@ -146,9 +259,7 @@ class _BabyCareSkeleton extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 8),
-
           SizedBox(
             height: 214,
             child: ListView.separated(

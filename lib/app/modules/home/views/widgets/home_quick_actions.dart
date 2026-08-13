@@ -47,10 +47,10 @@ class HomeQuickActionsRow extends StatelessWidget {
           Expanded(
             child: _QuickActionItem(
               icon: Icons.lightbulb_outline_rounded,
-              label: "All Brands",
+              label: "Recommended",
               color: _allBrandsColor,
               onTap: () {
-                Get.toNamed(Routes.BRAND_LIST);
+                Get.find<ProductController>().openTodayDealProducts();
               },
             ),
           ),
@@ -67,7 +67,7 @@ class HomeQuickActionsRow extends StatelessWidget {
           Expanded(
             child: _QuickActionItem(
               icon: Icons.bolt_outlined,
-              label: "Flash Sale",
+              label: "Best Price",
               color: _flashSaleColor,
               onTap: () {
                 // Later: Get.toNamed(Routes.FLASH_SALE);
@@ -77,7 +77,7 @@ class HomeQuickActionsRow extends StatelessWidget {
           Expanded(
             child: _QuickActionItem(
               icon: Icons.shopping_bag_outlined,
-              label: "New Arrivals",
+              label: "New Products",
               color: _newArrivalColor,
               onTap: () {
                 // Later: Get.toNamed(Routes.NEW_ARRIVALS);

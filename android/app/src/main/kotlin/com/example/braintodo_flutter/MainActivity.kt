@@ -1,4 +1,4 @@
-package com.pharmavan.customer
+package com.pharmavan.customernew
 
 import io.flutter.embedding.android.FlutterActivity
 

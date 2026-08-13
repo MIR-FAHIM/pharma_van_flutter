@@ -357,7 +357,7 @@ class _QtyStepper extends StatelessWidget {
               key: ValueKey(qty),
               width: 34,
               child: Text(
-                '$qty',
+                '$qty Box',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontWeight: FontWeight.w900,

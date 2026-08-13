@@ -1,4 +1,5 @@
 import 'package:ecom_user_flutter/app/models/ecom/product/brand_model.dart';
+import 'package:ecom_user_flutter/app/modules/products/controller/product_controller.dart';
 import 'package:ecom_user_flutter/app/modules/shop/controller/shop_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,31 +24,31 @@ class BrandListView extends GetView<ShopController> {
         elevation: 0,
         foregroundColor: _navy,
         title: Text(
-          "Brands",
+          "Manufacturer",
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w900,
             color: _navy,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: controller.getBrands,
-            icon: const Icon(Icons.refresh_rounded),
-          ),
-          const SizedBox(width: 6),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: controller.getBrands,
+        //     icon: const Icon(Icons.refresh_rounded),
+        //   ),
+        //   const SizedBox(width: 6),
+        // ],
       ),
       body: Obx(() {
         if (controller.isLoadingBrands.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (controller.error.value.isNotEmpty) {
-          return _ErrorState(
-            message: controller.error.value,
-            onRetry: controller.getBrands,
-          );
-        }
+        // if (controller.error.value.isNotEmpty) {
+        //   return _ErrorState(
+        //     message: controller.error.value,
+        //     onRetry: controller.getBrands,
+        //   );
+        // }
 
         final brands = controller.brandList.value;
 
@@ -57,7 +58,7 @@ class BrandListView extends GetView<ShopController> {
 
         return RefreshIndicator(
           onRefresh: () async {
-            await controller.getBrands();
+            await controller.getBrands(false);
           },
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(
@@ -73,12 +74,11 @@ class BrandListView extends GetView<ShopController> {
                   ),
                 ),
               ),
-
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                 sliver: SliverGrid(
                   delegate: SliverChildBuilderDelegate(
-                        (context, index) {
+                    (context, index) {
                       return _BrandCard(item: brands[index]);
                     },
                     childCount: brands.length,
@@ -151,9 +151,7 @@ class _HeaderCard extends StatelessWidget {
               size: 28,
             ),
           ),
-
           const SizedBox(width: 12),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +176,6 @@ class _HeaderCard extends StatelessWidget {
               ],
             ),
           ),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -219,7 +216,8 @@ class _SmallStatusPill extends StatelessWidget {
         vertical: 5,
       ),
       decoration: BoxDecoration(
-        color: darkText ? Colors.white.withOpacity(0.14) : color.withOpacity(0.18),
+        color:
+            darkText ? Colors.white.withOpacity(0.14) : color.withOpacity(0.18),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -250,7 +248,7 @@ class _BrandCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     final title = (item.name ?? "-").trim();
-    final logoUrl = _asImageUrl(item.logo);
+    final logoUrl = _asImageUrl(item.logo!.fileName);
     final isActive = item.isActive;
     final statusColor = isActive ? _green : _red;
 
@@ -260,6 +258,8 @@ class _BrandCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () {
+          Get.find<ProductController>().openBrandProducts(item.id);
+
           // Example:
           // Get.toNamed(Routes.BRAND_PRODUCTS, arguments: {"brand_id": item.id});
         },
@@ -299,9 +299,7 @@ class _BrandCard extends StatelessWidget {
                   ),
                 ),
               ),
-
               const Spacer(),
-
               Container(
                 width: 76,
                 height: 76,
@@ -315,39 +313,37 @@ class _BrandCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   child: logoUrl.isEmpty
                       ? const Icon(
-                    Icons.branding_watermark_outlined,
-                    color: Colors.black38,
-                    size: 34,
-                  )
+                          Icons.branding_watermark_outlined,
+                          color: Colors.black38,
+                          size: 34,
+                        )
                       : Image.network(
-                    logoUrl,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) {
-                      return const Icon(
-                        Icons.branding_watermark_outlined,
-                        color: Colors.black38,
-                        size: 34,
-                      );
-                    },
-                    loadingBuilder: (_, child, progress) {
-                      if (progress == null) return child;
+                          logoUrl,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) {
+                            return const Icon(
+                              Icons.branding_watermark_outlined,
+                              color: Colors.black38,
+                              size: 34,
+                            );
+                          },
+                          loadingBuilder: (_, child, progress) {
+                            if (progress == null) return child;
 
-                      return const Center(
-                        child: SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
+                            return const Center(
+                              child: SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
               ),
-
               const SizedBox(height: 6),
-
               Text(
                 title.isEmpty ? "-" : title,
                 maxLines: 2,
@@ -359,9 +355,7 @@ class _BrandCard extends StatelessWidget {
                   height: 1.2,
                 ),
               ),
-
               const SizedBox(height: 2),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -381,7 +375,6 @@ class _BrandCard extends StatelessWidget {
                   ),
                 ],
               ),
-
               const Spacer(),
             ],
           ),
@@ -397,9 +390,9 @@ String _asImageUrl(String? fileName) {
 
   final base = CompanyData.image_file_url.endsWith('/')
       ? CompanyData.image_file_url.substring(
-    0,
-    CompanyData.image_file_url.length - 1,
-  )
+          0,
+          CompanyData.image_file_url.length - 1,
+        )
       : CompanyData.image_file_url;
 
   final file = fileName.startsWith('/') ? fileName : '/$fileName';

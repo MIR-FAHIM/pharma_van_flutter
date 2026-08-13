@@ -3,6 +3,7 @@ import 'package:ecom_user_flutter/app/modules/cart/controller/cart_controller.da
 import 'package:ecom_user_flutter/app/modules/category/controller/category_controller.dart';
 import 'package:ecom_user_flutter/app/modules/order/controller/order_controller.dart';
 import 'package:ecom_user_flutter/app/modules/products/controller/product_controller.dart';
+import 'package:ecom_user_flutter/app/modules/shop/controller/shop_controller.dart';
 import 'package:get/get.dart';
 import 'package:ecom_user_flutter/app/modules/home/controllers/home_controller.dart';
 
@@ -16,6 +17,10 @@ class RootBinding extends Bindings {
     );
     Get.lazyPut<CategoryController>(
           () => CategoryController(),
+    );
+
+    Get.lazyPut<ShopController>(
+          () => ShopController(),
     );
     Get.lazyPut<HomeController>(
       () => HomeController(),

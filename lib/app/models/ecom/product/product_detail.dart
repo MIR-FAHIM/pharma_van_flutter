@@ -48,6 +48,7 @@ class ProductDetail {
   final Category? category;
   final Category? subCategory;
   final Shop? shop;
+  final Brand? brand;
 
   ProductDetail({
     required this.id,
@@ -69,6 +70,7 @@ class ProductDetail {
     this.category,
     this.subCategory,
     this.shop,
+    this.brand,
   });
 
   factory ProductDetail.fromJson(Map<String, dynamic> json) {
@@ -101,6 +103,9 @@ class ProductDetail {
           : Category.fromJson(json['sub_category']),
       shop:
       json['shop'] == null ? null : Shop.fromJson(json['shop']),
+
+      brand:
+      json['brand'] == null ? null : Brand.fromJson(json['brand']),
     );
   }
 }
@@ -154,12 +159,14 @@ class Category {
 class Shop {
   final int id;
   final String? name;
+  final String? shopName;
   final String? phone;
   final String? avatar;
 
   Shop({
     required this.id,
     this.name,
+    this.shopName,
     this.phone,
     this.avatar,
   });
@@ -168,8 +175,29 @@ class Shop {
     return Shop(
       id: json['id'],
       name: json['name'],
+      shopName: json['shop_name'],
       phone: json['phone'],
       avatar: json['avatar_original'],
+    );
+  }
+}
+
+class Brand {
+  final int id;
+  final String? name;
+
+
+  Brand({
+    required this.id,
+    this.name,
+
+  });
+
+  factory Brand.fromJson(Map<String, dynamic> json) {
+    return Brand(
+      id: json['id'],
+      name: json['name'],
+
     );
   }
 }

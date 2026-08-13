@@ -40,7 +40,7 @@ return {
 
 class ShopItem {
 int? currentPage;
-List<Datum>? data;
+List<DatumShop>? data;
 String? firstPageUrl;
 int? from;
 int? lastPage;
@@ -74,8 +74,8 @@ return ShopItem(
 currentPage: json["current_page"],
 data: json["data"] == null
 ? []
-    : List<Datum>.from(
-json["data"].map((x) => Datum.fromJson(x)),
+    : List<DatumShop>.from(
+json["data"].map((x) => DatumShop.fromJson(x)),
 ),
 firstPageUrl: json["first_page_url"]?.toString(),
 from: json["from"],
@@ -116,7 +116,7 @@ return {
 }
 }
 
-class Datum {
+class DatumShop {
 int? id;
 int? userId;
 String? name;
@@ -138,7 +138,7 @@ DateTime? createdAt;
 DateTime? updatedAt;
 User? user;
 
-Datum({
+DatumShop({
 this.id,
 this.userId,
 this.name,
@@ -161,8 +161,8 @@ this.updatedAt,
 this.user,
 });
 
-factory Datum.fromJson(Map<String, dynamic> json) {
-return Datum(
+factory DatumShop.fromJson(Map<String, dynamic> json) {
+return DatumShop(
 id: json["id"],
 userId: json["user_id"],
 name: json["name"]?.toString(),
