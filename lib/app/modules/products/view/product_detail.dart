@@ -49,7 +49,8 @@ class ProductDetailPage extends GetView<ProductController> {
       final productId = _ProductDetailHelper._productId(product);
       final maxStock = _ProductDetailHelper._productStock(product);
       final isOutOfStock = maxStock <= 0;
-      final unitPriceValue = _ProductDetailHelper._productFinalUnitPriceValue(product);
+      final unitPriceValue =
+          _ProductDetailHelper._productFinalUnitPriceValue(product);
 
       return Scaffold(
         backgroundColor: Colors.white,
@@ -95,7 +96,8 @@ class ProductDetailPage extends GetView<ProductController> {
                     _TotalPriceBlock(
                       controller: controller,
                       unitPriceValue: unitPriceValue,
-                      fallbackPriceText: _ProductDetailHelper._currentPriceText(product),
+                      fallbackPriceText:
+                          _ProductDetailHelper._currentPriceText(product),
                     ),
                     const SizedBox(height: 12),
                     _DescriptionBlock(
@@ -125,8 +127,6 @@ class ProductDetailPage extends GetView<ProductController> {
       );
     });
   }
-
-
 }
 
 class _ProductDetailHelper {
@@ -173,10 +173,10 @@ class _ProductDetailHelper {
   static String _productId(dynamic product) {
     return _clean(
       _firstValue([
-            () => product.id,
-            () => product.productId,
-            () => product['id'],
-            () => product['product_id'],
+        () => product.id,
+        () => product.productId,
+        () => product['id'],
+        () => product['product_id'],
       ]),
     );
   }
@@ -184,12 +184,12 @@ class _ProductDetailHelper {
   static String _productTitle(dynamic product) {
     return _clean(
       _firstValue([
-            () => product.name,
-            () => product.title,
-            () => product.productName,
-            () => product['name'],
-            () => product['title'],
-            () => product['product_name'],
+        () => product.name,
+        () => product.title,
+        () => product.productName,
+        () => product['name'],
+        () => product['title'],
+        () => product['product_name'],
       ]),
       fallback: 'Product Details',
     );
@@ -198,12 +198,12 @@ class _ProductDetailHelper {
   static String _productDescription(dynamic product) {
     final raw = _clean(
       _firstValue([
-            () => product.description,
-            () => product.shortDescription,
-            () => product.details,
-            () => product['description'],
-            () => product['short_description'],
-            () => product['details'],
+        () => product.description,
+        () => product.shortDescription,
+        () => product.details,
+        () => product['description'],
+        () => product['short_description'],
+        () => product['details'],
       ]),
     );
 
@@ -222,12 +222,12 @@ class _ProductDetailHelper {
     }
 
     final value = _firstValue([
-          () => product.mainPrice,
-          () => product.price,
-          () => product.basePrice,
-          () => product['main_price'],
-          () => product['price'],
-          () => product['base_price'],
+      () => product.mainPrice,
+      () => product.price,
+      () => product.basePrice,
+      () => product['main_price'],
+      () => product['price'],
+      () => product['base_price'],
     ]);
 
     return _money(value);
@@ -235,14 +235,14 @@ class _ProductDetailHelper {
 
   static double _productUnitPriceValue(dynamic product) {
     final value = _firstValue([
-          () => product.unitPrice,
-          () => product.price,
-          () => product.basePrice,
-          () => product.mainPrice,
-          () => product['unit_price'],
-          () => product['price'],
-          () => product['base_price'],
-          () => product['main_price'],
+      () => product.unitPrice,
+      () => product.price,
+      () => product.basePrice,
+      () => product.mainPrice,
+      () => product['unit_price'],
+      () => product['price'],
+      () => product['base_price'],
+      () => product['main_price'],
     ]);
 
     return _toDouble(value);
@@ -250,14 +250,14 @@ class _ProductDetailHelper {
 
   static int _productStock(dynamic product) {
     final value = _firstValue([
-          () => product.currentStock,
-          () => product.stock,
-          () => product.quantity,
-          () => product.qty,
-          () => product['current_stock'],
-          () => product['stock'],
-          () => product['quantity'],
-          () => product['qty'],
+      () => product.currentStock,
+      () => product.stock,
+      () => product.quantity,
+      () => product.qty,
+      () => product['current_stock'],
+      () => product['stock'],
+      () => product['quantity'],
+      () => product['qty'],
     ]);
 
     final raw = _clean(value);
@@ -281,14 +281,14 @@ class _ProductDetailHelper {
     }
 
     final value = _firstValue([
-          () => product.strokedPrice,
-          () => product.oldPrice,
-          () => product.purchasePrice,
-          () => product.regularPrice,
-          () => product['stroked_price'],
-          () => product['old_price'],
-          () => product['purchase_price'],
-          () => product['regular_price'],
+      () => product.strokedPrice,
+      () => product.oldPrice,
+      () => product.purchasePrice,
+      () => product.regularPrice,
+      () => product['stroked_price'],
+      () => product['old_price'],
+      () => product['purchase_price'],
+      () => product['regular_price'],
     ]);
 
     return _money(value, allowEmpty: true);
@@ -297,10 +297,10 @@ class _ProductDetailHelper {
   static String _discountText(dynamic product) {
     final direct = _clean(
       _firstValue([
-            () => product.discountText,
-            () => product.discountLabel,
-            () => product['discount_text'],
-            () => product['discount_label'],
+        () => product.discountText,
+        () => product.discountLabel,
+        () => product['discount_text'],
+        () => product['discount_label'],
       ]),
     );
 
@@ -347,10 +347,10 @@ class _ProductDetailHelper {
 
   static double _productDiscountValue(dynamic product) {
     final value = _firstValue([
-          () => product.discount,
-          () => product.discountAmount,
-          () => product['discount'],
-          () => product['discount_amount'],
+      () => product.discount,
+      () => product.discountAmount,
+      () => product['discount'],
+      () => product['discount_amount'],
     ]);
 
     return _toDouble(value);
@@ -359,8 +359,8 @@ class _ProductDetailHelper {
   static String _productDiscountType(dynamic product) {
     return _clean(
       _firstValue([
-            () => product.discountType,
-            () => product['discount_type'],
+        () => product.discountType,
+        () => product['discount_type'],
       ]),
     );
   }
@@ -377,25 +377,25 @@ class _ProductDetailHelper {
 
     addImage(
       _firstValue([
-            () => product.primaryImage?.url,
-            () => product.primaryImage?.fileName,
-            () => product.primaryImage?.resolvedUrl(
-          baseUrl: CompanyData.image_file_url,
-        ),
-            () => product.thumbnailImage?.url,
-            () => product.thumbnailImage?.fileName,
-            () => product.image,
-            () => product.thumbnail,
-            () => product.photo,
-            () => product['primary_image']?['url'],
-            () => product['primary_image']?['file_name'],
-            () => product['primary_image']?['resolved_url'],
-            () => product['thumbnail_image']?['url'],
-            () => product['thumbnail_image']?['file_name'],
-            () => product['thumbnail_image']?['resolved_url'],
-            () => product['image'],
-            () => product['thumbnail'],
-            () => product['photo'],
+        () => product.primaryImage?.url,
+        () => product.primaryImage?.fileName,
+        () => product.primaryImage?.resolvedUrl(
+              baseUrl: CompanyData.image_file_url,
+            ),
+        () => product.thumbnailImage?.url,
+        () => product.thumbnailImage?.fileName,
+        () => product.image,
+        () => product.thumbnail,
+        () => product.photo,
+        () => product['primary_image']?['url'],
+        () => product['primary_image']?['file_name'],
+        () => product['primary_image']?['resolved_url'],
+        () => product['thumbnail_image']?['url'],
+        () => product['thumbnail_image']?['file_name'],
+        () => product['thumbnail_image']?['resolved_url'],
+        () => product['image'],
+        () => product['thumbnail'],
+        () => product['photo'],
       ]),
     );
 
@@ -405,12 +405,12 @@ class _ProductDetailHelper {
       for (final item in gallery) {
         addImage(
           _firstValue([
-                () => item.url,
-                () => item.fileName,
-                () => item.resolvedUrl(baseUrl: CompanyData.image_file_url),
-                () => item['url'],
-                () => item['file_name'],
-                () => item['resolved_url'],
+            () => item.url,
+            () => item.fileName,
+            () => item.resolvedUrl(baseUrl: CompanyData.image_file_url),
+            () => item['url'],
+            () => item['file_name'],
+            () => item['resolved_url'],
           ]),
         );
       }
@@ -430,9 +430,9 @@ class _ProductDetailHelper {
 
     final base = CompanyData.image_file_url.endsWith('/')
         ? CompanyData.image_file_url.substring(
-      0,
-      CompanyData.image_file_url.length - 1,
-    )
+            0,
+            CompanyData.image_file_url.length - 1,
+          )
         : CompanyData.image_file_url;
 
     final path = raw.startsWith('/') ? raw.substring(1) : raw;
@@ -483,7 +483,6 @@ class _ProductDetailHelper {
         .trim();
   }
 }
-
 
 class _ProductImageHeader extends StatefulWidget {
   const _ProductImageHeader({
@@ -539,41 +538,41 @@ class _ProductImageHeaderState extends State<_ProductImageHeader> {
             child: widget.images.isEmpty
                 ? const _ImagePlaceholder()
                 : PageView.builder(
-              controller: _pageController,
-              physics: const BouncingScrollPhysics(),
-              itemCount: widget.images.length,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              itemBuilder: (context, index) {
-                final imageUrl = widget.images[index];
+                    controller: _pageController,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: widget.images.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      final imageUrl = widget.images[index];
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 34,
-                    vertical: 8,
-                  ),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 34,
+                          vertical: 8,
+                        ),
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) return child;
 
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            );
+                          },
+                          errorBuilder: (_, __, ___) {
+                            return const _ImagePlaceholder();
+                          },
                         ),
                       );
                     },
-                    errorBuilder: (_, __, ___) {
-                      return const _ImagePlaceholder();
-                    },
                   ),
-                );
-              },
-            ),
           ),
           Positioned(
             left: 14,
@@ -801,7 +800,7 @@ class _DotsIndicator extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
         count > 5 ? 5 : count,
-            (index) {
+        (index) {
           final active = index == currentIndex;
 
           return AnimatedContainer(
@@ -854,33 +853,33 @@ class _RatingSoldRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final rating = _ProductDetailHelper._toDouble(
       _ProductDetailHelper._firstValue([
-            () => product.rating,
-            () => product.averageRating,
-            () => product.avgRating,
-            () => product['rating'],
-            () => product['average_rating'],
+        () => product.rating,
+        () => product.averageRating,
+        () => product.avgRating,
+        () => product['rating'],
+        () => product['average_rating'],
       ]),
     );
 
     final reviewCount = _ProductDetailHelper._clean(
       _ProductDetailHelper._firstValue([
-            () => product.reviewCount,
-            () => product.reviewsCount,
-            () => product.reviews,
-            () => product['review_count'],
-            () => product['reviews_count'],
+        () => product.reviewCount,
+        () => product.reviewsCount,
+        () => product.reviews,
+        () => product['review_count'],
+        () => product['reviews_count'],
       ]),
       fallback: '0',
     );
 
     final soldCount = _ProductDetailHelper._clean(
       _ProductDetailHelper._firstValue([
-            () => product.numOfSale,
-            () => product.sold,
-            () => product.totalSold,
-            () => product['num_of_sale'],
-            () => product['sold'],
-            () => product['total_sold'],
+        () => product.numOfSale,
+        () => product.sold,
+        () => product.totalSold,
+        () => product['num_of_sale'],
+        () => product['sold'],
+        () => product['total_sold'],
       ]),
       fallback: '0',
     );
@@ -889,7 +888,7 @@ class _RatingSoldRow extends StatelessWidget {
       children: [
         ...List.generate(
           5,
-              (index) {
+          (index) {
             return Icon(
               index < rating.round() ? Icons.star_rounded : Icons.star_rounded,
               size: 15,
@@ -977,7 +976,7 @@ class _PriceRow extends StatelessWidget {
                 discount,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style:  TextStyle(
+                style: TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.w500,
                   fontSize: 18,
@@ -1002,32 +1001,31 @@ class _SellerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final sellerName = _ProductDetailHelper._clean(
       _ProductDetailHelper._firstValue([
-            () => product.shop?.shopName,
-            () => product.seller?.name,
-            () => product.addedBy,
-            () => product.sellerName,
-            () => product['shop']?['name'],
-            () => product['seller']?['name'],
-            () => product['added_by'],
-            () => product['seller_name'],
+        () => product.shop?.shopName,
+        () => product.seller?.name,
+        () => product.addedBy,
+        () => product.sellerName,
+        () => product['shop']?['name'],
+        () => product['seller']?['name'],
+        () => product['added_by'],
+        () => product['seller_name'],
       ]),
       fallback: 'Color Crush',
     );
-final brandName = _ProductDetailHelper._clean(
+    final brandName = _ProductDetailHelper._clean(
       _ProductDetailHelper._firstValue([
-            () => product.brand?.name,
-
+        () => product.brand?.name,
       ]),
       fallback: 'No Brand',
     );
 
     final sellerImage = _ProductDetailHelper._clean(
       _ProductDetailHelper._firstValue([
-            () => product.shop?.logo?.resolvedUrl,
-            () => product.shop?.logo?.url,
-            () => product.seller?.avatar,
-            () => product['shop']?['logo']?['resolved_url'],
-            () => product['shop']?['logo']?['url'],
+        () => product.shop?.logo?.resolvedUrl,
+        () => product.shop?.logo?.url,
+        () => product.seller?.avatar,
+        () => product['shop']?['logo']?['resolved_url'],
+        () => product['shop']?['logo']?['url'],
       ]),
     );
 
@@ -1050,21 +1048,21 @@ final brandName = _ProductDetailHelper._clean(
             clipBehavior: Clip.antiAlias,
             child: sellerImage.isEmpty
                 ? const Icon(
-              Icons.storefront_rounded,
-              color: Color(0xFF00509D),
-              size: 22,
-            )
+                    Icons.storefront_rounded,
+                    color: Color(0xFF00509D),
+                    size: 22,
+                  )
                 : Image.network(
-              sellerImage,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) {
-                return const Icon(
-                  Icons.storefront_rounded,
-                  color: Color(0xFF00509D),
-                  size: 22,
-                );
-              },
-            ),
+                    sellerImage,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) {
+                      return const Icon(
+                        Icons.storefront_rounded,
+                        color: Color(0xFF00509D),
+                        size: 22,
+                      );
+                    },
+                  ),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -1096,7 +1094,7 @@ final brandName = _ProductDetailHelper._clean(
               ],
             ),
           ),
- Expanded(
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1125,8 +1123,6 @@ final brandName = _ProductDetailHelper._clean(
               ],
             ),
           ),
-
-
         ],
       ),
     );
@@ -1183,111 +1179,114 @@ class _QuantityRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Obx(() {
+      final selectedBoxes = isOutOfStock ? 0 : controller.quantity.value;
 
-    if(isOutOfStock == true){
-
-      return Row(
-        children: [
-          const Text(
-            "Quantity",
-            style: TextStyle(
-              color: Color(0xFF00509D),
-              fontWeight: FontWeight.w900,
-              fontSize: 14,
-            ),
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FBFF),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: const Color(0xFF00509D).withOpacity(0.14),
           ),
-          const SizedBox(width: 20),
-          _QtyButton(
-            icon: Icons.remove_rounded,
-            onTap: isOutOfStock ? null : controller.decreaseQty,
-          ),
-          const SizedBox(width: 14),
-          Text(
-            isOutOfStock ? '0' : controller.quantity.value.toString(),
-            style: TextStyle(
-              color: isOutOfStock
-                  ? const Color(0xFF9CA3AF)
-                  : const Color(0xFF00509D),
-              fontWeight: FontWeight.w900,
-              fontSize: 17,
-            ),
-          ),
-          const SizedBox(width: 14),
-          _QtyButton(
-            icon: Icons.add_rounded,
-            onTap: isOutOfStock
-                ? null
-                : () {
-              controller.increaseQty(maxStock: maxStock);
-            },
-          ),
-          const SizedBox(width: 14),
-          Text(
-            isOutOfStock ? '(Stock Out)' : "Stock ($maxStock) available",
-            style: TextStyle(
-              color: isOutOfStock
-                  ? const Color(0xFFE11D48)
-                  : const Color(0xFF7B8DA3),
-              fontWeight: FontWeight.w800,
-              fontSize: 13,
-            ),
-          ),
-        ],
-      );
-
-    }else{
-      return Obx(() {
-        return Row(
+        ),
+        child: Row(
           children: [
-            const Text(
-              "Box",
-              style: TextStyle(
-                color: Color(0xFF00509D),
-                fontWeight: FontWeight.w900,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(width: 20),
-            _QtyButton(
-              icon: Icons.remove_rounded,
-              onTap: isOutOfStock ? null : controller.decreaseQty,
-            ),
-            const SizedBox(width: 14),
-            Text(
-              isOutOfStock ? '0' : controller.quantity.value.toString(),
-              style: TextStyle(
+            Container(
+              height: 38,
+              width: 38,
+              decoration: BoxDecoration(
                 color: isOutOfStock
-                    ? const Color(0xFF9CA3AF)
+                    ? const Color(0xFFF1F5F9)
+                    : const Color(0xFFEAF2FA),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.inventory_2_outlined,
+                color: isOutOfStock
+                    ? const Color(0xFF94A3B8)
                     : const Color(0xFF00509D),
-                fontWeight: FontWeight.w900,
-                fontSize: 17,
+                size: 20,
               ),
             ),
-            const SizedBox(width: 14),
-            _QtyButton(
-              icon: Icons.add_rounded,
-              onTap: isOutOfStock
-                  ? null
-                  : () {
-                controller.increaseQty(maxStock: maxStock);
-              },
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "How Many Box?",
+                    style: TextStyle(
+                      color: Color(0xFF00509D),
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isOutOfStock
+                        ? "No box available"
+                        : "$selectedBoxes box selected -  $maxStock boxes available",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: isOutOfStock
+                          ? const Color(0xFFE11D48)
+                          : const Color(0xFF64748B),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(width: 14),
-            Text(
-              isOutOfStock ? '(Stock Out)' : "($maxStock)",
-              style: TextStyle(
-                color: isOutOfStock
-                    ? const Color(0xFFE11D48)
-                    : const Color(0xFF7B8DA3),
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
+            Container(
+              height: 36,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: const Color(0xFFE2E8F0),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _QtyButton(
+                    icon: Icons.remove_rounded,
+                    onTap: isOutOfStock ? null : controller.decreaseQty,
+                  ),
+                  SizedBox(
+                    width: 34,
+                    child: Text(
+                      selectedBoxes.toString(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: isOutOfStock
+                            ? const Color(0xFF9CA3AF)
+                            : const Color(0xFF00509D),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  _QtyButton(
+                    icon: Icons.add_rounded,
+                    onTap: isOutOfStock
+                        ? null
+                        : () {
+                            controller.increaseQty(maxStock: maxStock);
+                          },
+                  ),
+                ],
               ),
             ),
           ],
-        );
-      });
-    }
-
+        ),
+      );
+    });
   }
 }
 
@@ -1383,12 +1382,10 @@ class _DescriptionBlock extends StatefulWidget {
   final String description;
 
   @override
-  State<_DescriptionBlock> createState() =>
-      _DescriptionBlockState();
+  State<_DescriptionBlock> createState() => _DescriptionBlockState();
 }
 
-class _DescriptionBlockState
-    extends State<_DescriptionBlock> {
+class _DescriptionBlockState extends State<_DescriptionBlock> {
   static const Color _primary = Color(0xFF00509D);
   static const Color _border = Color(0xFFE5E7EB);
   static const Color _background = Color(0xFFF8FAFC);
@@ -1410,11 +1407,11 @@ class _DescriptionBlockState
   String get _plainText {
     try {
       return html_parser
-          .parse(_safeHtml)
-          .body
-          ?.text
-          .replaceAll(RegExp(r'\s+'), ' ')
-          .trim() ??
+              .parse(_safeHtml)
+              .body
+              ?.text
+              .replaceAll(RegExp(r'\s+'), ' ')
+              .trim() ??
           '';
     } catch (_) {
       return '';
@@ -1444,8 +1441,8 @@ class _DescriptionBlockState
 
   @override
   void didUpdateWidget(
-      covariant _DescriptionBlock oldWidget,
-      ) {
+    covariant _DescriptionBlock oldWidget,
+  ) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.description != widget.description) {
@@ -1480,13 +1477,11 @@ class _DescriptionBlockState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(),
-
           const Divider(
             height: 1,
             thickness: 1,
             color: _border,
           ),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(
               14,
@@ -1503,9 +1498,7 @@ class _DescriptionBlockState
               child: _buildDescriptionContent(),
             ),
           ),
-
-          if (_shouldShowToggle)
-            _buildToggleButton(),
+          if (_shouldShowToggle) _buildToggleButton(),
         ],
       ),
     );
@@ -1522,13 +1515,10 @@ class _DescriptionBlockState
       child: const Row(
         children: [
           _DescriptionIcon(),
-
           SizedBox(width: 10),
-
           Expanded(
             child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Product Description',
@@ -1568,13 +1558,11 @@ class _DescriptionBlockState
           Positioned.fill(
             child: ClipRect(
               child: SingleChildScrollView(
-                physics:
-                const NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 child: _buildHtml(),
               ),
             ),
           ),
-
           Positioned(
             left: 0,
             right: 0,
@@ -1691,8 +1679,7 @@ class _DescriptionBlockState
         ),
         'th': Style(
           padding: HtmlPaddings.all(8),
-          backgroundColor:
-          const Color(0xFFEAF2FA),
+          backgroundColor: const Color(0xFFEAF2FA),
         ),
         'td': Style(
           padding: HtmlPaddings.all(8),
@@ -1707,8 +1694,7 @@ class _DescriptionBlockState
             right: 8,
             bottom: 8,
           ),
-          backgroundColor:
-          const Color(0xFFF1F5F9),
+          backgroundColor: const Color(0xFFF1F5F9),
           border: const Border(
             left: BorderSide(
               color: _primary,
@@ -1718,15 +1704,14 @@ class _DescriptionBlockState
         ),
         'a': Style(
           color: _primary,
-          textDecoration:
-          TextDecoration.underline,
+          textDecoration: TextDecoration.underline,
         ),
       },
       onLinkTap: (
-          url,
-          attributes,
-          element,
-          ) {
+        url,
+        attributes,
+        element,
+      ) {
         debugPrint(
           'Description link tapped: $url',
         );
@@ -1760,37 +1745,30 @@ class _DescriptionBlockState
               ),
               decoration: BoxDecoration(
                 color: _primary.withOpacity(0.08),
-                borderRadius:
-                BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(30),
                 border: Border.all(
-                  color:
-                  _primary.withOpacity(0.15),
+                  color: _primary.withOpacity(0.15),
                 ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _isExpanded
-                        ? 'Show Less'
-                        : 'View Full Description',
+                    _isExpanded ? 'Show Less' : 'View Full Description',
                     style: const TextStyle(
                       color: _primary,
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-
                   const SizedBox(width: 5),
-
                   AnimatedRotation(
                     turns: _isExpanded ? 0.5 : 0,
                     duration: const Duration(
                       milliseconds: 220,
                     ),
                     child: const Icon(
-                      Icons
-                          .keyboard_arrow_down_rounded,
+                      Icons.keyboard_arrow_down_rounded,
                       color: _primary,
                       size: 19,
                     ),
@@ -1807,8 +1785,7 @@ class _DescriptionBlockState
   static String _normaliseHtml(String value) {
     var html = value.trim();
 
-    if (html.isEmpty ||
-        html.toLowerCase() == 'null') {
+    if (html.isEmpty || html.toLowerCase() == 'null') {
       return '';
     }
 
@@ -1832,8 +1809,7 @@ class _DescriptionIcon extends StatelessWidget {
       width: 38,
       height: 38,
       decoration: BoxDecoration(
-        color: const Color(0xFF00509D)
-            .withOpacity(0.10),
+        color: const Color(0xFF00509D).withOpacity(0.10),
         borderRadius: BorderRadius.circular(11),
       ),
       child: const Icon(
@@ -1861,10 +1837,10 @@ class _SmartInfoRows extends StatelessWidget {
           child: _SimpleInfoText(
             text: _ProductDetailHelper._clean(
               _ProductDetailHelper._firstValue([
-                    () => product.videoLink,
-                    () => product.video,
-                    () => product['video_link'],
-                    () => product['video'],
+                () => product.videoLink,
+                () => product.video,
+                () => product['video_link'],
+                () => product['video'],
               ]),
               fallback: 'No video available for this product.',
             ),
@@ -1999,18 +1975,18 @@ class _RelatedProductsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final filtered = products
         .where((item) {
-      final dynamic product = item;
-      final id = _ProductDetailHelper._clean(
-        _ProductDetailHelper._firstValue([
+          final dynamic product = item;
+          final id = _ProductDetailHelper._clean(
+            _ProductDetailHelper._firstValue([
               () => product.id,
               () => product.productId,
               () => product['id'],
               () => product['product_id'],
-        ]),
-      );
+            ]),
+          );
 
-      return id != currentProductId;
-    })
+          return id != currentProductId;
+        })
         .take(8)
         .toList();
 
@@ -2054,18 +2030,18 @@ class _TopSellingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final filtered = products
         .where((item) {
-      final dynamic product = item;
-      final id = _ProductDetailHelper._clean(
-        _ProductDetailHelper._firstValue([
+          final dynamic product = item;
+          final id = _ProductDetailHelper._clean(
+            _ProductDetailHelper._firstValue([
               () => product.id,
               () => product.productId,
               () => product['id'],
               () => product['product_id'],
-        ]),
-      );
+            ]),
+          );
 
-      return id != currentProductId;
-    })
+          return id != currentProductId;
+        })
         .take(5)
         .toList();
 
@@ -2138,12 +2114,12 @@ class _TopSellingCard extends StatelessWidget {
               child: images.isEmpty
                   ? const _ImagePlaceholder()
                   : Image.network(
-                images.first,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) {
-                  return const _ImagePlaceholder();
-                },
-              ),
+                      images.first,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) {
+                        return const _ImagePlaceholder();
+                      },
+                    ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -2192,7 +2168,7 @@ class _TopSellingCard extends StatelessWidget {
                             discount,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style:  TextStyle(
+                            style: TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.w500,
                               fontSize: 13,
@@ -2337,20 +2313,20 @@ class _BottomActionBar extends StatelessWidget {
                   onPressed: controller.isCartLoading.value || isOutOfStock
                       ? null
                       : () {
-                    if (productId.isEmpty) {
-                      Get.snackbar(
-                        'Error',
-                        'Product ID not found',
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      return;
-                    }
+                          if (productId.isEmpty) {
+                            Get.snackbar(
+                              'Error',
+                              'Product ID not found',
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                            return;
+                          }
 
-                    controller.addToCart(
-                      productId: productId,
-                      qty: controller.quantity.value,
-                    );
-                  },
+                          controller.addToCart(
+                            productId: productId,
+                            qty: controller.quantity.value,
+                          );
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isOutOfStock
                         ? const Color(0xFFCBD5E1)
@@ -2366,20 +2342,20 @@ class _BottomActionBar extends StatelessWidget {
                   ),
                   child: controller.isCartLoading.value
                       ? const SizedBox(
-                    height: 19,
-                    width: 19,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                          height: 19,
+                          width: 19,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : Text(
-                    isOutOfStock ? "Stock Out" : "Add To Cart",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 15,
-                    ),
-                  ),
+                          isOutOfStock ? "Stock Out" : "Add To Cart",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15,
+                          ),
+                        ),
                 );
               }),
             ),

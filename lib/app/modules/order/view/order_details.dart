@@ -704,7 +704,7 @@ class _BottomActions extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             SizedBox(
-              height: 48,
+              height: Get.height*.1,
               width: Get.width*.4,
               child: ElevatedButton.icon(
                 onPressed: () {
@@ -729,7 +729,7 @@ class _BottomActions extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 48,
+              height: Get.height*.1,
               width: Get.width*.4,
               child: ElevatedButton.icon(
                 onPressed: () {

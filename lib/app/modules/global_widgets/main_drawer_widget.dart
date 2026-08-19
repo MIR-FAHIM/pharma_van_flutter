@@ -247,7 +247,7 @@ class MainDrawerWidget extends StatelessWidget {
                       ),
                       DrawerLinkWidget(
                         icon: 'assets/drawer/deactivate_account.png',
-                        text: "App Version: 7".tr,
+                        text: "App Version: 8".tr,
                         onTap: (e) {
                           //  Get.toNamed(Routes.DEACTIVATE_ACCCOUNT);
                           // Get.toNamed(Routes.Test);
