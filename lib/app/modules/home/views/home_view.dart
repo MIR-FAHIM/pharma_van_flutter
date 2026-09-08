@@ -183,15 +183,7 @@ class HomeView extends GetView<HomeController> {
               ),
 
               // Medicine or Grocery style product section
-              SliverToBoxAdapter(
-                child: _PdfSectionBlock(
-                  backgroundColor: AppColors.backgroundColor,
-                  child: HomeGrocerySection(),
-                ),
-              ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 14),
-              ),
+
 
               SliverToBoxAdapter(
                 child: _PdfSectionBlock(
@@ -204,21 +196,7 @@ class HomeView extends GetView<HomeController> {
                 child: SizedBox(height: 14),
               ),
 
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 14),
-              ),
 
-              // Baby care section
-              SliverToBoxAdapter(
-                child: _PdfSectionBlock(
-                  backgroundColor: AppColors.backgroundColor,
-                  child: HomeBabyCareSection(),
-                ),
-              ),
-
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 14),
-              ),
               SliverToBoxAdapter(
                 child: _PdfSectionBlock(
                   backgroundColor: AppColors.backgroundColor,

@@ -157,7 +157,7 @@ class _HeaderCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Brand Directory',
+                  'Manufacturer Directory',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
@@ -248,7 +248,7 @@ class _BrandCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     final title = (item.name ?? "-").trim();
-    final logoUrl = _asImageUrl(item.logo!.fileName);
+    final logoUrl = _asImageUrl(item.logo?.fileName);
     final isActive = item.isActive;
     final statusColor = isActive ? _green : _red;
 
@@ -278,28 +278,8 @@ class _BrandCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    isActive ? "Active" : "Inactive",
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              ),
-              const Spacer(),
+
+
               Container(
                 width: 76,
                 height: 76,
